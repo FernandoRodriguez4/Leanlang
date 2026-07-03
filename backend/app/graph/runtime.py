@@ -1,9 +1,10 @@
 """Runtime del grafo: gestiona el checkpointer y guarda el grafo compilado.
 
-Prioridad de checkpointer:
-  1. SQLite (persistente, sin servidor) — ideal para correr sin Docker.
-  2. Postgres (si se configura y esta disponible).
-  3. Memoria (ultimo recurso; se pierde al reiniciar).
+Prioridad de checkpointer (cadena por defecto, `init_graph_persistent`):
+  1. Postgres (`PostgresSaver`, esquema `langgraph`) — checkpointer principal.
+  2. Memoria (ultimo recurso; se pierde al reiniciar).
+
+Sin SQLite (Fase 6): unica alternativa de persistencia real es Postgres.
 
 El grafo compilado se guarda como singleton de modulo y se inicializa en el
 lifespan de FastAPI (o de forma perezosa para tests).
@@ -35,19 +36,18 @@ def init_graph_memory():
     return _graph
 
 
-def init_graph_sqlite(stack: ExitStack):
-    """Compila el grafo con SqliteSaver (persistente, sin servidor).
+def _with_search_path(dsn: str, schema: str = "langgraph") -> str:
+    """Garantiza que la conexion del saver fije `search_path` al esquema
+    indicado, sin depender de que `LANGGRAPH_PG_DSN` ya lo incluya.
 
-    Sobrevive a reinicios del backend: los blueprints pausados se pueden reanudar.
-    `stack` (ExitStack del lifespan) mantiene viva la conexion mientras corre la app.
+    Plan Fase 3: "Garantizar search_path=langgraph en la conexion del saver
+    (via DSN options=-c search_path=langgraph, o configurando la
+    conexion/pool del PostgresSaver)".
     """
-    global _graph
-    from langgraph.checkpoint.sqlite import SqliteSaver
-
-    saver = stack.enter_context(SqliteSaver.from_conn_string(settings.checkpoint_db_path))
-    saver.setup()  # crea las tablas del checkpointer si no existen
-    _graph = build_blueprint_graph(saver)
-    return _graph
+    if "search_path" in dsn:
+        return dsn
+    sep = "&" if "?" in dsn else "?"
+    return f"{dsn}{sep}options=-c%20search_path%3D{schema}"
 
 
 def init_graph_postgres(stack: ExitStack):
@@ -56,8 +56,9 @@ def init_graph_postgres(stack: ExitStack):
     try:
         from langgraph.checkpoint.postgres import PostgresSaver
 
-        saver = stack.enter_context(PostgresSaver.from_conn_string(settings.langgraph_pg_dsn))
-        saver.setup()
+        dsn = _with_search_path(settings.langgraph_pg_dsn)
+        saver = stack.enter_context(PostgresSaver.from_conn_string(dsn))
+        saver.setup()  # crea checkpoints/checkpoint_blobs/checkpoint_writes/checkpoint_migrations en `langgraph`
         _graph = build_blueprint_graph(saver)
         return _graph
     except Exception as exc:  # pragma: no cover
@@ -66,11 +67,10 @@ def init_graph_postgres(stack: ExitStack):
 
 
 def init_graph_persistent(stack: ExitStack):
-    """Elige el mejor checkpointer disponible: SQLite -> memoria."""
-    try:
-        init_graph_sqlite(stack)
-        print(f"[runtime] Checkpointer SQLite activo ({settings.checkpoint_db_path}).")
-    except Exception as exc:  # pragma: no cover
-        print(f"[runtime] SQLite checkpointer no disponible ({exc}); usando memoria.")
+    """Elige el checkpointer por defecto: Postgres -> memoria (Postgres-first)."""
+    if settings.langgraph_pg_dsn:
+        init_graph_postgres(stack)
+    else:
+        print("[runtime] LANGGRAPH_PG_DSN no configurado; usando memoria.")
         init_graph_memory()
     return _graph

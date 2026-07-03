@@ -4,20 +4,17 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
 
 
-def _uuid() -> str:
-    return str(uuid.uuid4())
-
-
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -30,11 +27,13 @@ class User(Base):
 class Project(Base):
     __tablename__ = "projects"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     raw_idea: Mapped[str] = mapped_column(Text, nullable=False)
-    constraints: Mapped[dict] = mapped_column(JSON, default=dict)
+    constraints: Mapped[dict] = mapped_column(JSONB, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     owner: Mapped["User"] = relationship(back_populates="projects")
@@ -45,14 +44,17 @@ class Project(Base):
 
 class Blueprint(Base):
     __tablename__ = "blueprints"
+    __table_args__ = (
+        CheckConstraint("status IN ('running', 'awaiting_input', 'done')", name="status_valid"),
+    )
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    project_id: Mapped[str] = mapped_column(
-        ForeignKey("projects.id", ondelete="CASCADE"), index=True
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), index=True
     )
     thread_id: Mapped[str] = mapped_column(String(64), index=True)  # enlaza con el checkpointer
-    state: Mapped[dict] = mapped_column(JSON, default=dict)
-    status: Mapped[str] = mapped_column(String(32), default="draft")  # draft|interrupted|done
+    state: Mapped[dict] = mapped_column(JSONB, default=dict)
+    status: Mapped[str] = mapped_column(String(32))  # running|awaiting_input|done
     version: Mapped[int] = mapped_column(Integer, default=1)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
@@ -63,18 +65,24 @@ class Experiment(Base):
     """Catalogo de los 44 experimentos del libro (fuente de verdad del Selector)."""
 
     __tablename__ = "experiments"
+    __table_args__ = (
+        CheckConstraint("cost BETWEEN 1 AND 5", name="cost_range"),
+        CheckConstraint("setup_time BETWEEN 1 AND 5", name="setup_time_range"),
+        CheckConstraint("run_time BETWEEN 1 AND 5", name="run_time_range"),
+        CheckConstraint("evidence_strength BETWEEN 1 AND 5", name="evidence_strength_range"),
+    )
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)  # slug, ej. "customer-interview"
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     category: Mapped[str] = mapped_column(String(32))  # discovery|validation
     subcategory: Mapped[str] = mapped_column(String(64))
-    types: Mapped[list] = mapped_column(JSON, default=list)  # ["desirability","feasibility",...]
+    types: Mapped[list] = mapped_column(JSONB, default=list)  # ["desirability","feasibility",...]
     cost: Mapped[int] = mapped_column(Integer)  # 1..5
     setup_time: Mapped[int] = mapped_column(Integer)  # 1..5
     run_time: Mapped[int] = mapped_column(Integer)  # 1..5
     evidence_strength: Mapped[int] = mapped_column(Integer)  # 1..5
-    capabilities: Mapped[list] = mapped_column(JSON, default=list)
+    capabilities: Mapped[list] = mapped_column(JSONB, default=list)
     description: Mapped[str] = mapped_column(Text)
-    pairings_before: Mapped[list] = mapped_column(JSON, default=list)
-    pairings_after: Mapped[list] = mapped_column(JSON, default=list)
+    pairings_before: Mapped[list] = mapped_column(JSONB, default=list)
+    pairings_after: Mapped[list] = mapped_column(JSONB, default=list)
     page_ref: Mapped[int | None] = mapped_column(Integer, nullable=True)

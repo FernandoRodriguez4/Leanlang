@@ -39,9 +39,8 @@ def seed_experiments(db: Session) -> int:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from app.db.session import SessionLocal, init_db
+    from app.db.session import SessionLocal
 
-    init_db()
     with SessionLocal() as session:
         n = seed_experiments(session)
         print(f"Seed completado. Nuevos experimentos insertados: {n}")

@@ -66,8 +66,8 @@ docker compose up --build
 cd backend
 python -m venv .venv && source .venv/Scripts/activate   # Windows Git Bash
 pip install -e ".[dev]"
-cp .env.example .env                                     # configura LLM_PROVIDER/MODEL + API key
-# Postgres opcional: si no hay DB, el grafo usa checkpointer en memoria
+cp .env.example .env                                     # configura LLM_PROVIDER/MODEL + API key + DATABASE_URL
+alembic upgrade head                                      # crea el esquema de negocio en Postgres
 uvicorn app.main:app --reload
 ```
 **Frontend:**
@@ -127,10 +127,12 @@ tiempo-de-diseño y aplica SUS de usabilidad.
 ## Tests
 ```bash
 cd backend
-JWT_SECRET=test DATABASE_URL="sqlite:///./t.db" python -m pytest -q
+python -m pytest -q
 ```
+`tests/conftest.py` fija `JWT_SECRET` y una BD de test PostgreSQL aislada (`blueprint_test`,
+derivada del `DATABASE_URL` de tu `.env`) automáticamente — no requiere variables manuales.
 Cubre: catálogo (44), grafo completo con LLM falso (interrupts + loop del crítico + anclaje
-del selector), API (auth/proyectos), y la rúbrica DSR. **14 tests.**
+del selector), API (auth/proyectos) y la rúbrica DSR. **47 tests.**
 
 ---
 

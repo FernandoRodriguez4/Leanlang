@@ -23,8 +23,6 @@ class Settings(BaseSettings):
     # DB
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/blueprint"
     langgraph_pg_dsn: str = "postgresql://postgres:postgres@localhost:5432/blueprint"
-    # Checkpointer persistente sin servidor (LangGraph SqliteSaver)
-    checkpoint_db_path: str = "./checkpoints.sqlite"
 
     # Auth
     jwt_secret: str = "change-me"

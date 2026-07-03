@@ -12,6 +12,7 @@ worker thread donde corre graph.stream (no depende de contextvars).
 from __future__ import annotations
 
 import os
+import uuid
 from copy import deepcopy
 from typing import Any
 
@@ -50,9 +51,9 @@ def configure_langsmith() -> None:
 def build_run_config(
     thread_id: str,
     *,
-    user_id: str,
-    project_id: str,
-    blueprint_id: str,
+    user_id: str | uuid.UUID,
+    project_id: str | uuid.UUID,
+    blueprint_id: str | uuid.UUID,
     phase: str | None = None,
     base: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -72,6 +73,12 @@ def build_run_config(
 
     if not tracing_enabled():
         return config
+
+    # user_id/project_id/blueprint_id llegan como uuid.UUID (ORM nativo) o str;
+    # se normalizan a str aqui, exclusivamente para metadata/tags de LangSmith.
+    user_id = str(user_id) if user_id is not None else None
+    project_id = str(project_id) if project_id is not None else None
+    blueprint_id = str(blueprint_id) if blueprint_id is not None else None
 
     phase_clean = phase.strip() if isinstance(phase, str) else None
     phase_clean = phase_clean or None  # "" → None

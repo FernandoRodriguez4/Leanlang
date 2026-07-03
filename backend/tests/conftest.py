@@ -2,11 +2,26 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import pytest
+from dotenv import dotenv_values
+from sqlalchemy.engine import make_url
 
 os.environ.setdefault("JWT_SECRET", "test")
-os.environ.setdefault("DATABASE_URL", "sqlite:///./test.db")
+
+# BD de test: PostgreSQL aislado (Fase 6 -- SQLite ya no es un backend valido, los
+# modelos usan UUID/JSONB nativos que SQLite no puede compilar). Se deriva del
+# DATABASE_URL real del `.env` (mismo host/usuario/password que ya usa el dev)
+# cambiando solo el nombre de la base, para no depender de credenciales hardcodeadas
+# ni colisionar con la BD de desarrollo (`blueprint`).
+if "DATABASE_URL" not in os.environ:
+    _dotenv_path = Path(__file__).resolve().parent.parent / ".env"
+    _dev_url = dotenv_values(_dotenv_path).get("DATABASE_URL") or (
+        "postgresql+psycopg://postgres:postgres@localhost:5432/blueprint"
+    )
+    _test_url = make_url(_dev_url).set(database="blueprint_test")
+    os.environ["DATABASE_URL"] = _test_url.render_as_string(hide_password=False)
 
 from app.schemas.experiment import ExperimentRec, ExperimentRecList  # noqa: E402
 from app.schemas.hypothesis import (  # noqa: E402
@@ -156,3 +171,28 @@ def fake_llm(monkeypatch):
                 experiment_design, metrics, success_criteria, decision, sequencing, critic, report):
         monkeypatch.setattr(mod, "get_structured_model", fake_get_structured_model)
     return fake_get_structured_model
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _reset_test_schema():
+    """Reconstruye el esquema de `blueprint_test` via Alembic -- el mismo
+    mecanismo que usa produccion (`alembic upgrade head`), sin `create_all()`.
+
+    El esquema se vacia por completo (incluida `alembic_version`) antes de
+    migrar: un `DROP SCHEMA`/`CREATE SCHEMA` deja a Alembic sin ningun estado
+    de version previo, para que `upgrade("head")` siempre corra la migracion
+    completa desde cero en cada sesion de tests (evita, ademas, que filas de
+    una corrida anterior, ej. `dup@b.com`, rompan asserts en la siguiente).
+    """
+    from alembic import command
+    from alembic.config import Config
+    from sqlalchemy import text
+
+    from app.db.session import engine
+
+    with engine.begin() as conn:
+        conn.execute(text("DROP SCHEMA public CASCADE"))
+        conn.execute(text("CREATE SCHEMA public"))
+
+    alembic_cfg = Config(str(Path(__file__).resolve().parent.parent / "alembic.ini"))
+    command.upgrade(alembic_cfg, "head")

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -15,7 +16,7 @@ class UserCreate(BaseModel):
 
 
 class UserOut(BaseModel):
-    id: str
+    id: UUID
     email: EmailStr
     created_at: datetime
 
@@ -33,7 +34,7 @@ class ProjectCreate(BaseModel):
 
 
 class ProjectOut(BaseModel):
-    id: str
+    id: UUID
     name: str
     raw_idea: str
     constraints: dict

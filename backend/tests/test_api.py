@@ -1,10 +1,5 @@
-"""Tests de la API (auth, proyectos, catalogo) con TestClient + SQLite."""
+"""Tests de la API (auth, proyectos, catalogo) con TestClient + PostgreSQL (ver conftest.py)."""
 from __future__ import annotations
-
-import os
-
-os.environ.setdefault("JWT_SECRET", "test")
-os.environ.setdefault("DATABASE_URL", "sqlite:///./test_api.db")
 
 import pytest
 from fastapi.testclient import TestClient

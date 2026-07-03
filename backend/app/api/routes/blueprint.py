@@ -57,7 +57,7 @@ def _persist_final(thread_id: str, blueprint_id: str) -> dict:
 
 async def _sse(graph, payload, config: dict, blueprint_id: str, emit_started: bool = False):
     if emit_started:
-        yield {"event": "started", "data": json.dumps({"blueprint_id": blueprint_id})}
+        yield {"event": "started", "data": json.dumps({"blueprint_id": str(blueprint_id)})}
     async for ev in event_stream(graph, payload, config):
         yield ev
     yield _persist_final(config["configurable"]["thread_id"], blueprint_id)

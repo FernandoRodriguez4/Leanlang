@@ -10,7 +10,7 @@ from app.api.routes import auth, blueprint, export, projects
 from app.catalog.seed import seed_experiments
 from app.core.config import settings
 from app.core.observability import configure_langsmith
-from app.db.session import SessionLocal, init_db
+from app.db.session import SessionLocal
 from app.graph.runtime import init_graph_memory, init_graph_persistent
 
 
@@ -20,16 +20,17 @@ async def lifespan(app: FastAPI):
     # 0) Observabilidad (LangSmith) — activada/desactivada por env, sin tocar agentes.
     configure_langsmith()
 
-    # 1) Esquema de BD (dev). En prod: alembic upgrade head.
+    # 1) Esquema de BD: gestionado por Alembic (`alembic upgrade head`), paso
+    #    de despliegue previo al arranque. El proceso ya no crea tablas.
     try:
-        init_db()
         with SessionLocal() as db:
             n = seed_experiments(db)
             print(f"[startup] Catalogo sembrado (nuevos: {n}).")
     except Exception as exc:  # pragma: no cover
-        print(f"[startup] BD no disponible ({exc}); el grafo usara memoria.")
+        msg = str(exc).encode("ascii", errors="replace").decode("ascii")
+        print(f"[startup] BD no disponible ({msg}); el grafo usara memoria.")
 
-    # 2) Grafo + checkpointer (SQLite persistente con fallback a memoria)
+    # 2) Grafo + checkpointer (Postgres persistente con fallback a memoria)
     try:
         init_graph_persistent(stack)
     except Exception:  # pragma: no cover
