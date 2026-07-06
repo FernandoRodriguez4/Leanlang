@@ -21,8 +21,17 @@ class Settings(BaseSettings):
     llm_version: str = "default"
 
     # DB
-    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/blueprint"
-    langgraph_pg_dsn: str = "postgresql://postgres:postgres@localhost:5432/blueprint"
+    database_url: str = "postgresql+psycopg://postgres:admin@localhost:5432/blueprint"
+    langgraph_pg_dsn: str = "postgresql://postgres:admin@localhost:5432/blueprint"
+    # Pool de conexiones SQLAlchemy (Fase 2, ver docs/audits/phase2_rag_architecture_improvements.md).
+    # El checkpointer de LangGraph (PostgresSaver) usa su propia conexion unica
+    # (psycopg.Connection.connect, no un pool) — es independiente de este pool.
+    # Este dimensionamiento cubre solo el CRUD de negocio (auth/projects/blueprints)
+    # y la escritura de la proyeccion derivada `blueprints.state`, ambos de vida corta.
+    db_pool_size: int = 10
+    db_max_overflow: int = 20
+    db_pool_timeout: int = 30
+    db_pool_recycle: int = 1800
 
     # Auth
     jwt_secret: str = "change-me"
@@ -32,6 +41,28 @@ class Settings(BaseSettings):
     # App
     app_env: str = "development"  # development | staging | production
     cors_origins: str = "http://localhost:3000"
+
+    # Orquestacion (grafo)
+    max_revisions: int = 2  # cuantas veces el critico puede devolver al Experiment Design
+    messages_window: int = 20  # ventana de trazas conservadas en `messages` (poda por conteo)
+
+    # Fase 2 — validacion temporal de la proyeccion derivada (`blueprints.state`)
+    # contra el checkpointer (fuente de verdad). Solo para el periodo de validacion
+    # previo a confiar definitivamente en la proyeccion; no es un mecanismo
+    # permanente (ver docs/audits/backend_architecture_evolution_validation.md, Punto 2).
+    shadow_read_enabled: bool = False
+
+    # Fase 3 — contrato del futuro Knowledge Service (ver
+    # docs/audits/phase3_architecture_changes.md). Estos valores no activan
+    # ninguna ruta de codigo nueva en esta fase: `semantic_search` es unicamente
+    # un `Protocol` sin implementacion (app/catalog/service.py). Se definen aqui
+    # para que la Fase 4 solo tenga que consumirlos, sin tocar el mecanismo de
+    # configuracion. Sin valor de dimension de vector: depende del proveedor de
+    # embeddings, aun no seleccionado.
+    embedding_provider: str | None = None
+    embedding_model: str | None = None
+    rag_top_k: int = 5
+    rag_score_threshold: float = 0.0
 
     # Observabilidad (LangSmith) — todo por env, sin acoplar a los agentes
     langsmith_tracing: bool = False

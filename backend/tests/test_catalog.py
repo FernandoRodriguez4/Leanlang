@@ -1,6 +1,10 @@
 """Tests del catalogo de experimentos (sin LLM)."""
 from __future__ import annotations
 
+import inspect
+
+import pytest
+
 from app.catalog import service
 
 
@@ -41,3 +45,25 @@ def test_pairings_exist_in_catalog():
     for e in catalog:
         for ref in e.pairings_before + e.pairings_after:
             assert ref in ids, f"pairing inexistente: {ref} en {e.id}"
+
+
+def test_knowledge_service_is_a_protocol_not_a_stub():
+    """Fase 3: `KnowledgeService` es unicamente un contrato de tipado (Protocol),
+    sin cuerpo ejecutable ni instanciacion posible."""
+    assert getattr(service.KnowledgeService, "_is_protocol", False) is True
+
+    with pytest.raises(TypeError):
+        service.KnowledgeService()  # los Protocol no son instanciables
+
+
+def test_knowledge_service_semantic_search_has_no_executable_body():
+    source = inspect.getsource(service.KnowledgeService.semantic_search)
+    body = source.split(":", 1)[1].strip()
+    assert body in ("...", "...\n")
+
+
+def test_query_experiments_signature_matches_protocol():
+    protocol_params = inspect.signature(service.KnowledgeService.query_experiments).parameters
+    real_params = inspect.signature(service.query_experiments).parameters
+    # el Protocol declara `self` de mas; el resto de la firma debe coincidir
+    assert list(protocol_params)[1:] == list(real_params)

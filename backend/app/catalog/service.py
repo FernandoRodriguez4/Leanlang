@@ -8,12 +8,47 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from pathlib import Path
+from typing import Any, Protocol, Sequence
 
 from langsmith import traceable
 
 from app.schemas.experiment import ExperimentCatalogItem
 
 _CATALOG_PATH = Path(__file__).parent / "experiments.json"
+
+
+class KnowledgeService(Protocol):
+    """Contrato publico del futuro Knowledge Service (Fase 3, ver
+    docs/audits/phase3_architecture_changes.md #4 y #8).
+
+    `query_experiments` ya esta satisfecho hoy por las funciones de este modulo
+    (busqueda exacta sobre el catalogo curado de 44 experimentos). `semantic_search`
+    es unicamente la firma publica del segundo modo de recuperacion (semantico,
+    sobre pgvector); su implementacion pertenece exclusivamente a la Fase 4 y no
+    tiene cuerpo ejecutable aqui -- es un `Protocol` (tipado estructural), no una
+    clase instanciable ni un stub en runtime.
+
+    El tipo de retorno de `semantic_search` se deja deliberadamente generico
+    (`Sequence[Any]`) para no acoplar el contrato a un esquema de datos (p. ej. un
+    futuro `KnowledgeChunk`) que aun no existe y que se definira en la Fase 4 junto
+    con la tabla de conocimiento.
+
+    Una vez aprobada, esta firma publica se congela: la implementacion de
+    `semantic_search` podra cambiar libremente en la Fase 4, pero la interfaz no
+    debe romperse sin pasar de nuevo por aprobacion explicita.
+    """
+
+    def query_experiments(
+        self,
+        risk_type: str | None = None,
+        stage: str | None = None,
+        max_cost: int | None = None,
+        max_setup_time: int | None = None,
+        min_evidence_strength: int | None = None,
+        limit: int = 10,
+    ) -> list[ExperimentCatalogItem]: ...
+
+    def semantic_search(self, query: str, top_k: int = 5) -> Sequence[Any]: ...
 
 
 @lru_cache

@@ -4,13 +4,25 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, BaseMessage, RemoveMessage
 
 
 def trace(agent: str, text: str, *, version: str | None = None) -> AIMessage:
     """Mensaje de traza para streaming/observabilidad (incluye el nombre del agente)."""
     content = f"[{version}] {text}" if version else text
     return AIMessage(content=content, name=agent)
+
+
+def prune_messages(messages: list[BaseMessage], *, window: int) -> list[RemoveMessage]:
+    """Poda por conteo de `messages`: devuelve `RemoveMessage` para lo mas antiguo
+    que exceda `window`, respetando el reducer `add_messages` (identifica por id).
+
+    No resume ni reescribe contenido: `messages` es traza de streaming/observabilidad,
+    no memoria que se reinyecte a los prompts de los agentes.
+    """
+    if len(messages) <= window:
+        return []
+    return [RemoveMessage(id=m.id) for m in messages[:-window] if m.id is not None]
 
 
 def jdump(obj: Any) -> str:

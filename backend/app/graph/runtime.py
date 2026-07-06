@@ -11,12 +11,25 @@ lifespan de FastAPI (o de forma perezosa para tests).
 """
 from __future__ import annotations
 
+import warnings
 from contextlib import ExitStack
 
 from app.core.config import settings
 from app.graph.build_graph import build_blueprint_graph
 
 _graph = None
+
+# Estado del checkpointer para el health-check (ver get_checkpointer_status()):
+# - _checkpointer_backend: "unknown" | "postgres" | "memory"
+# - _checkpointer_degraded: True solo cuando Postgres estaba configurado pero fallo
+#   y el grafo cayo a memoria (persistencia perdida sin fallar el arranque).
+_checkpointer_backend = "unknown"
+_checkpointer_degraded = False
+
+
+def get_checkpointer_status() -> dict:
+    """Estado del checkpointer para exponer en /health."""
+    return {"backend": _checkpointer_backend, "degraded": _checkpointer_degraded}
 
 
 def get_graph():
@@ -29,10 +42,11 @@ def get_graph():
 
 def init_graph_memory():
     """Compila el grafo con un checkpointer en memoria (dev/tests)."""
-    global _graph
+    global _graph, _checkpointer_backend
     from langgraph.checkpoint.memory import MemorySaver
 
     _graph = build_blueprint_graph(MemorySaver())
+    _checkpointer_backend = "memory"
     return _graph
 
 
@@ -52,7 +66,7 @@ def _with_search_path(dsn: str, schema: str = "langgraph") -> str:
 
 def init_graph_postgres(stack: ExitStack):
     """Compila el grafo con PostgresSaver; cae a memoria si Postgres no esta disponible."""
-    global _graph
+    global _graph, _checkpointer_backend, _checkpointer_degraded
     try:
         from langgraph.checkpoint.postgres import PostgresSaver
 
@@ -60,9 +74,18 @@ def init_graph_postgres(stack: ExitStack):
         saver = stack.enter_context(PostgresSaver.from_conn_string(dsn))
         saver.setup()  # crea checkpoints/checkpoint_blobs/checkpoint_writes/checkpoint_migrations en `langgraph`
         _graph = build_blueprint_graph(saver)
+        _checkpointer_backend = "postgres"
+        _checkpointer_degraded = False
         return _graph
     except Exception as exc:  # pragma: no cover
-        print(f"[runtime] Postgres checkpointer no disponible ({exc}); usando memoria.")
+        _checkpointer_degraded = True
+        warnings.warn(
+            f"[runtime] Postgres checkpointer no disponible ({exc}); cayendo a memoria. "
+            "Se pierde la persistencia de ejecucion hasta que Postgres vuelva a estar disponible.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        print(f"[runtime] ALERTA: Postgres checkpointer no disponible ({exc}); usando memoria (degraded).")
         return init_graph_memory()
 
 

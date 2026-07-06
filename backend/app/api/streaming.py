@@ -11,6 +11,8 @@ import threading
 from collections.abc import AsyncGenerator
 from typing import Any
 
+from langchain_core.messages import RemoveMessage
+
 ARTIFACT_FIELDS = [
     "problem",
     "customer_segment",
@@ -37,11 +39,21 @@ def serialize_blueprint(values: dict[str, Any]) -> dict[str, Any]:
 
 
 def _trace_text(update: dict[str, Any]) -> str | None:
+    """Texto de la ultima traza real de un write de nodo.
+
+    Ignora `RemoveMessage` (poda de `messages` por conteo, ver app/agents/base.py:prune_messages):
+    no llevan contenido y no deben interpretarse como la traza del nodo.
+    """
     msgs = update.get("messages") if isinstance(update, dict) else None
     if not msgs:
         return None
-    last = msgs[-1]
-    return getattr(last, "content", None) or (last.get("content") if isinstance(last, dict) else None)
+    for m in reversed(msgs):
+        if isinstance(m, RemoveMessage):
+            continue
+        content = getattr(m, "content", None) or (m.get("content") if isinstance(m, dict) else None)
+        if content:
+            return content
+    return None
 
 
 async def event_stream(graph, payload, config) -> AsyncGenerator[dict, None]:

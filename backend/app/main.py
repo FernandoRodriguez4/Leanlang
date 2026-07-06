@@ -11,7 +11,7 @@ from app.catalog.seed import seed_experiments
 from app.core.config import settings
 from app.core.observability import configure_langsmith
 from app.db.session import SessionLocal
-from app.graph.runtime import init_graph_memory, init_graph_persistent
+from app.graph.runtime import get_checkpointer_status, init_graph_memory, init_graph_persistent
 
 
 @asynccontextmanager
@@ -60,4 +60,11 @@ app.include_router(export.router)
 
 @app.get("/health", tags=["health"])
 def health():
-    return {"status": "ok", "llm_provider": settings.llm_provider, "llm_model": settings.llm_model}
+    checkpointer = get_checkpointer_status()
+    status = "degraded" if checkpointer["degraded"] else "ok"
+    return {
+        "status": status,
+        "llm_provider": settings.llm_provider,
+        "llm_model": settings.llm_model,
+        "checkpointer": checkpointer,
+    }

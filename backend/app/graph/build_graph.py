@@ -1,13 +1,13 @@
-"""Construccion del grafo del enjambre multiagente (LangGraph StateGraph).
+r"""Construccion del grafo del enjambre multiagente (LangGraph StateGraph).
 
 Arquitectura: Supervisor (orquestador, dueno del proceso) + Triaje (route_entry decide
-que agente cubre la tarea) + 9 Lean Agents, con bucle del Critico e interrupts human-in-the-loop.
+que agente cubre la tarea) + 14 Lean Agents, con bucle del Critico e interrupts human-in-the-loop.
 
     START -> supervisor -(triaje)-> problem | hypotheses | risk
-    problem -> customer_segment -> value_proposition -> hypotheses
+    problem -> customer_segment -> value_proposition -> business_model -> hypotheses
     hypotheses -> [interrupt] human_hypotheses -> risk            (Risk Agent: tipo+nivel+2x2)
     risk -> [interrupt] human_prioritization -> experiment_design
-    experiment_design -> metrics -> success_criteria -> critic
+    experiment_design -> metrics -> success_criteria -> decision -> sequencing -> plan_estimate -> critic
     critic -(route)-> bump_revision -> experiment_design          (si no pasa, hasta MAX_REVISIONS)
                     \-> report -> [interrupt] human_approval -> END
 """
