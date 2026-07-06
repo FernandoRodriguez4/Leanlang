@@ -7,39 +7,39 @@
    WCAG AA: texto principal sobre superficie ≥ 7:1 en ambos temas.
    =========================================================================== */
 :root {
-  --bg: 234 238 246;        /* #eaeef6 papel de dibujo */
-  --surface: 255 255 255;   /* tarjetas */
-  --text: 12 26 46;         /* #0c1a2e tinta */
-  --border: 210 219 234;    /* #d2dbea hairline */
-  --tint: 224 233 255;      /* realce activo (blueprint-100) */
+  --bg: 250 250 250;        /* #fafafa fondo */
+  --surface: 255 255 255;   /* #ffffff tarjetas */
+  --text: 17 17 17;         /* #111111 texto principal */
+  --border: 229 231 235;    /* #e5e7eb hairline */
+  --tint: 215 243 231;      /* realce activo (blueprint-100, verde muy suave) */
 
-  --desire-soft: 251 235 209; --desire-ink: 138 78 0;
-  --feas-soft: 210 240 246;   --feas-ink: 10 85 103;
-  --viab-soft: 214 242 224;   --viab-ink: 12 92 50;
+  --desire-soft: 245 232 209; --desire-ink: 138 92 26;
+  --feas-soft: 219 236 240;   --feas-ink: 30 90 104;
+  --viab-soft: 214 240 226;   --viab-ink: 15 90 56;
 
-  /* Semáforo (verde / ámbar / rojo) */
-  --ok: 22 163 74;      --ok-soft: 220 252 231;   --ok-ink: 21 128 61;
-  --warn: 217 119 6;    --warn-soft: 254 243 199;  --warn-ink: 180 83 9;
-  --danger: 220 38 38;  --danger-soft: 254 226 226; --danger-ink: 185 28 28;
+  /* Semáforo (verde / ámbar / rojo) — atenuado */
+  --ok: 15 138 95;      --ok-soft: 224 246 236;   --ok-ink: 13 106 73;
+  --warn: 180 130 44;   --warn-soft: 250 240 220;  --warn-ink: 138 94 24;
+  --danger: 190 62 62;  --danger-soft: 250 228 228; --danger-ink: 154 40 40;
 
   color-scheme: light;
 }
 
 .dark {
-  --bg: 9 14 26;            /* fondo profundo navy-negro */
-  --surface: 19 27 44;      /* #131b2c tarjeta elevada */
-  --text: 226 232 244;      /* #e2e8f4 texto claro */
-  --border: 39 51 74;       /* borde tenue */
-  --tint: 30 51 110;        /* realce activo en oscuro */
+  --bg: 10 10 11;           /* #0a0a0b fondo profundo neutro */
+  --surface: 20 20 22;      /* #141416 tarjeta elevada */
+  --text: 245 245 245;      /* #f5f5f5 texto claro */
+  --border: 40 40 43;       /* borde tenue */
+  --tint: 16 42 33;         /* realce activo en oscuro */
 
-  --desire-soft: 66 44 6;  --desire-ink: 247 201 110;
-  --feas-soft: 8 52 62;    --feas-ink: 125 220 235;
-  --viab-soft: 10 56 32;   --viab-ink: 110 224 150;
+  --desire-soft: 54 42 20;  --desire-ink: 230 189 118;
+  --feas-soft: 16 44 50;    --feas-ink: 137 209 222;
+  --viab-soft: 14 46 32;    --viab-ink: 116 214 165;
 
   /* Semáforo en oscuro (tonos más claros para contraste) */
-  --ok: 74 222 128;      --ok-soft: 8 50 28;     --ok-ink: 134 239 172;
-  --warn: 251 191 36;    --warn-soft: 60 42 8;   --warn-ink: 252 211 77;
-  --danger: 248 113 113; --danger-soft: 67 14 14; --danger-ink: 252 165 165;
+  --ok: 90 214 165;      --ok-soft: 14 46 36;     --ok-ink: 150 232 197;
+  --warn: 224 181 106;   --warn-soft: 52 42 20;   --warn-ink: 232 197 132;
+  --danger: 224 130 130; --danger-soft: 58 24 24; --danger-ink: 240 172 172;
 
   color-scheme: dark;
 }
@@ -53,8 +53,8 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
   h1, h2, h3, h4, h5 { @apply font-display; }
-  ::selection { @apply bg-blueprint-600/25 text-blueprint-900; }
-  .dark ::selection { @apply bg-blueprint-500/35 text-white; }
+  ::selection { @apply bg-blueprint-600/20 text-blueprint-900; }
+  .dark ::selection { @apply bg-blueprint-500/30 text-white; }
   ::-webkit-scrollbar { width: 11px; height: 11px; }
   ::-webkit-scrollbar-thumb { @apply rounded-full bg-line; border: 3px solid transparent; background-clip: content-box; }
   ::-webkit-scrollbar-thumb:hover { @apply bg-blueprint-400; border: 3px solid transparent; background-clip: content-box; }
@@ -64,18 +64,19 @@
   /* — Botones — */
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold tracking-tight
-      transition-all duration-150 focus-visible:outline-none focus-visible:ring-2
+      transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2
       focus-visible:ring-blueprint-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper
       disabled:cursor-not-allowed disabled:opacity-60;
   }
-  .btn-primary { @apply btn bg-blueprint-600 text-white shadow-sm hover:bg-blueprint-700 active:scale-[0.98]; }
+  .btn-primary { @apply btn bg-blueprint-600 text-white shadow-sm hover:bg-blueprint-700 hover:-translate-y-px active:translate-y-0 active:scale-[0.98]; }
   .btn-amber { @apply btn bg-accent-500 text-night shadow-sm hover:bg-accent-400 active:scale-[0.98]; }
-  .btn-secondary { @apply btn border border-line bg-surface text-ink/80 shadow-sm hover:border-blueprint-300 hover:text-ink active:scale-[0.98]; }
-  .btn-ghost { @apply btn text-ink/60 hover:bg-surface hover:text-ink; }
+  .btn-secondary { @apply btn border border-line bg-transparent text-ink/75 hover:border-ink/25 hover:bg-ink/[0.03] hover:text-ink active:scale-[0.98]; }
+  .btn-ghost { @apply btn text-ink/60 hover:bg-ink/[0.04] hover:text-ink; }
+  .btn-danger { @apply btn bg-danger text-white shadow-sm hover:opacity-90 active:scale-[0.98]; }
 
   /* — Superficies — */
   .card { @apply rounded-2xl border border-line bg-surface shadow-card; }
-  .glass { @apply border-line bg-surface/80 backdrop-blur-lg; }
+  .glass { @apply border-line bg-surface/70 backdrop-blur-lg; }
 
   /* — Formularios — */
   .label { @apply mb-1.5 block text-sm font-medium text-ink/80; }
@@ -93,35 +94,35 @@
   .data { @apply font-mono text-[11px] tabular-nums text-ink/70; }
 
   /* — Texto de marca — */
-  .text-gradient { @apply bg-gradient-to-br from-blueprint-700 via-blueprint-500 to-feas bg-clip-text text-transparent; }
+  .text-gradient { @apply bg-gradient-to-br from-blueprint-800 via-blueprint-600 to-feas bg-clip-text text-transparent; }
   .dark .text-gradient { @apply from-blueprint-300 via-blueprint-400 to-feas; }
 }
 
 /* Aclara los acentos de texto en modo oscuro (contraste AA) — red de seguridad
    centralizada para no tocar cada utilidad por separado. */
 .dark .text-blueprint-600,
-.dark .text-blueprint-700 { color: rgb(147 180 253); }
-.dark .text-blueprint-800 { color: rgb(191 211 254); }
-.dark .text-accent-700 { color: rgb(247 201 72); }
+.dark .text-blueprint-700 { color: rgb(110 214 175); }
+.dark .text-blueprint-800 { color: rgb(160 230 200); }
+.dark .text-accent-700 { color: rgb(220 187 114); }
 
 @layer utilities {
-  /* Retícula de plano (cianotipo) — adapta intensidad por tema */
+  /* Retícula de fondo — textura sutil, casi imperceptible */
   .bp-grid {
     background-image:
-      linear-gradient(to right, rgb(36 86 230 / 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(36 86 230 / 0.05) 1px, transparent 1px);
-    background-size: 26px 26px;
+      linear-gradient(to right, rgb(17 17 17 / 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(17 17 17 / 0.035) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
   .dark .bp-grid {
     background-image:
-      linear-gradient(to right, rgb(147 180 253 / 0.07) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(147 180 253 / 0.07) 1px, transparent 1px);
+      linear-gradient(to right, rgb(245 245 245 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(245 245 245 / 0.05) 1px, transparent 1px);
   }
   .bp-grid-dark {
     background-image:
-      linear-gradient(to right, rgb(147 180 253 / 0.10) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(147 180 253 / 0.10) 1px, transparent 1px);
-    background-size: 30px 30px;
+      linear-gradient(to right, rgb(245 245 245 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(245 245 245 / 0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
   .anim-pulse2 { animation: pulse2 1.6s ease-in-out infinite; }
   .anim-float { animation: float 6s ease-in-out infinite; }

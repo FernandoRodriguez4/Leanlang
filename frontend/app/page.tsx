@@ -56,15 +56,15 @@ export default function Landing() {
 
       {/* Header */}
       <header className="glass sticky top-0 z-40 border-b">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
+        <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-6">
           <Logo />
-          <nav className="hidden items-center gap-7 text-sm font-medium text-ink/65 md:flex">
-            <a href="#beneficios" className="transition hover:text-ink">Beneficios</a>
-            <a href="#proceso" className="transition hover:text-ink">Cómo funciona</a>
-            <a href="#casos" className="transition hover:text-ink">Casos de uso</a>
-            <a href="#faq" className="transition hover:text-ink">FAQ</a>
+          <nav className="hidden items-center gap-9 text-[13.5px] font-medium text-ink/60 md:flex">
+            <a href="#beneficios" className="transition-colors hover:text-ink">Beneficios</a>
+            <a href="#proceso" className="transition-colors hover:text-ink">Cómo funciona</a>
+            <a href="#casos" className="transition-colors hover:text-ink">Casos de uso</a>
+            <a href="#faq" className="transition-colors hover:text-ink">FAQ</a>
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <ThemeToggle />
             <AuthCta variant="nav" />
           </div>
@@ -75,23 +75,23 @@ export default function Landing() {
         {/* Hero */}
         <section className="relative overflow-hidden border-b border-line">
           <div className="bp-grid pointer-events-none absolute inset-0 -z-10" />
-          <div className="pointer-events-none absolute inset-0 -z-10" style={{ background: "radial-gradient(70% 60% at 50% -10%, rgba(36,86,230,0.12), transparent 70%)" }} />
-          <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-16 sm:py-24 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="pointer-events-none absolute inset-0 -z-10" style={{ background: "radial-gradient(70% 60% at 50% -10%, rgba(15,138,95,0.10), transparent 70%)" }} />
+          <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 py-24 sm:py-32 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
-              <span className="badge mb-5 border border-blueprint-200 bg-blueprint-500/10 text-blueprint-700 dark:text-blueprint-300">
+              <span className="badge mb-7 border border-blueprint-200 bg-blueprint-500/[0.07] text-blueprint-700 dark:text-blueprint-300">
                 <span className="annot text-blueprint-700 dark:text-blueprint-300">Método</span>
                 Testing Business Ideas · Bland &amp; Osterwalder
               </span>
-              <h1 className="text-balance font-display text-4xl font-bold leading-[1.05] tracking-tight text-ink sm:text-6xl">
+              <h1 className="text-balance font-display text-5xl font-bold leading-[1.05] tracking-tight text-ink sm:text-7xl">
                 El plano de tu <span className="text-gradient">validación</span>, trazado en una sesión
               </h1>
-              <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-ink/70">
+              <p className="mt-7 max-w-xl text-pretty text-lg leading-relaxed text-ink/60 sm:text-xl">
                 Siete agentes leen tu idea y devuelven un blueprint accionable: hipótesis, riesgos,
                 qué probar primero y con qué experimento — con métricas y criterios de éxito. Tú
                 decides en cada paso clave.
               </p>
-              <div className="mt-9"><AuthCta variant="hero" /></div>
-              <p className="annot mt-5 text-ink/45">Sin tarjeta · Multi-proyecto · Exporta a Markdown / JSON</p>
+              <div className="mt-10"><AuthCta variant="hero" /></div>
+              <p className="annot mt-6 text-ink/40">Sin tarjeta · Multi-proyecto · Exporta a Markdown / JSON</p>
             </div>
             <HeroMap />
           </div>
@@ -99,11 +99,11 @@ export default function Landing() {
 
         {/* Estadísticas */}
         <section className="border-b border-line bg-paper/60">
-          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-5 py-10 sm:grid-cols-4">
+          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-14 sm:grid-cols-4">
             {STATS.map(([big, small]) => (
               <div key={small} className="text-center">
                 <div className="font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">{big}</div>
-                <div className="mt-1 text-sm text-ink/55">{small}</div>
+                <div className="mt-1.5 text-sm text-ink/50">{small}</div>
               </div>
             ))}
           </div>
@@ -111,15 +111,15 @@ export default function Landing() {
 
         {/* D/F/V */}
         <section className="border-b border-line">
-          <div className="mx-auto grid max-w-6xl gap-4 px-5 py-10 sm:grid-cols-3">
+          <div className="mx-auto grid max-w-6xl gap-5 px-6 py-14 sm:grid-cols-3">
             {DFV.map((r) => (
-              <div key={r.k} className="card flex items-center gap-3 p-4">
-                <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${r.cls}`}>
+              <div key={r.k} className="card flex items-center gap-4 p-5">
+                <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${r.cls}`}>
                   <span className={`h-2.5 w-2.5 rounded-full ${r.dot}`} />
                 </span>
                 <div>
                   <div className="font-display text-sm font-semibold text-ink">{r.k}</div>
-                  <div className="text-sm text-ink/55">{r.q}</div>
+                  <div className="text-sm text-ink/50">{r.q}</div>
                 </div>
               </div>
             ))}
@@ -127,21 +127,21 @@ export default function Landing() {
         </section>
 
         {/* Beneficios */}
-        <section id="beneficios" className="mx-auto max-w-6xl px-5 py-20">
+        <section id="beneficios" className="mx-auto max-w-6xl px-6 py-28">
           <div className="mx-auto max-w-2xl text-center">
             <span className="annot text-blueprint-600">Por qué importa</span>
-            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">Menos corazonadas, más método</h2>
-            <p className="mt-4 text-lg text-ink/65">El valor no es generar texto: es decidir con rigor qué probar y cómo.</p>
+            <h2 className="mt-3 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">Menos corazonadas, más método</h2>
+            <p className="mt-5 text-lg text-ink/60">El valor no es generar texto: es decidir con rigor qué probar y cómo.</p>
           </div>
-          <div className="mt-12 grid gap-5 sm:grid-cols-2">
+          <div className="mt-16 grid gap-6 sm:grid-cols-2">
             {BENEFITS.map((b) => (
-              <div key={b.t} className="card group flex gap-4 p-6 transition hover:-translate-y-1 hover:shadow-lift">
-                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-blueprint-500 to-feas text-white">
+              <div key={b.t} className="card group flex gap-5 p-7 transition duration-200 hover:-translate-y-1 hover:shadow-lift">
+                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-blueprint-600 text-white">
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={b.icon} /></svg>
                 </div>
                 <div>
                   <h3 className="font-display font-semibold text-ink">{b.t}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-ink/65">{b.d}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink/60">{b.d}</p>
                 </div>
               </div>
             ))}
@@ -150,21 +150,21 @@ export default function Landing() {
 
         {/* Cómo funciona */}
         <section id="proceso" className="border-y border-line bg-paper/50">
-          <div className="mx-auto max-w-6xl px-5 py-20">
+          <div className="mx-auto max-w-6xl px-6 py-28">
             <div className="mx-auto max-w-2xl text-center">
               <span className="annot text-blueprint-600">El proceso</span>
-              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">Siete estaciones, un plano</h2>
-              <p className="mt-4 text-lg text-ink/65">Cada agente es de triaje: decide y entrega un artefacto al siguiente. El orden importa, y aquí se respeta.</p>
+              <h2 className="mt-3 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">Siete estaciones, un plano</h2>
+              <p className="mt-5 text-lg text-ink/60">Cada agente es de triaje: decide y entrega un artefacto al siguiente. El orden importa, y aquí se respeta.</p>
             </div>
-            <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {STAGES.map((s) => (
-                <div key={s.id} className="card group relative p-6 transition hover:-translate-y-1 hover:shadow-lift">
-                  <div className="mb-3 flex items-center gap-3">
+                <div key={s.id} className="card group relative p-7 transition duration-200 hover:-translate-y-1 hover:shadow-lift">
+                  <div className="mb-4 flex items-center gap-3">
                     <span className="font-mono text-xs font-semibold text-blueprint-600">{s.id}</span>
                     <span className="h-px flex-1 bg-line" />
                     <h3 className="font-display text-base font-semibold text-ink">{s.t}</h3>
                   </div>
-                  <p className="text-sm leading-relaxed text-ink/65">{s.d}</p>
+                  <p className="text-sm leading-relaxed text-ink/60">{s.d}</p>
                 </div>
               ))}
             </div>
@@ -172,17 +172,17 @@ export default function Landing() {
         </section>
 
         {/* Casos de uso */}
-        <section id="casos" className="mx-auto max-w-6xl px-5 py-20">
+        <section id="casos" className="mx-auto max-w-6xl px-6 py-28">
           <div className="mx-auto max-w-2xl text-center">
             <span className="annot text-blueprint-600">Para quién</span>
-            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">Tres formas de usarlo</h2>
+            <h2 className="mt-3 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">Tres formas de usarlo</h2>
           </div>
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
+          <div className="mt-16 grid gap-6 md:grid-cols-3">
             {CASES.map((c) => (
-              <div key={c.tag} className="card flex flex-col p-6">
-                <span className="badge mb-3 w-fit bg-blueprint-500/15 text-blueprint-700 dark:text-blueprint-300">{c.tag}</span>
+              <div key={c.tag} className="card flex flex-col p-7 transition duration-200 hover:-translate-y-1 hover:shadow-lift">
+                <span className="badge mb-4 w-fit bg-blueprint-500/10 text-blueprint-700 dark:text-blueprint-300">{c.tag}</span>
                 <h3 className="font-display text-lg font-semibold text-ink">{c.t}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink/65">{c.d}</p>
+                <p className="mt-2.5 text-sm leading-relaxed text-ink/60">{c.d}</p>
               </div>
             ))}
           </div>
@@ -191,12 +191,12 @@ export default function Landing() {
         {/* Alcance */}
         <section id="alcance" className="relative overflow-hidden bg-night">
           <div className="bp-grid-dark pointer-events-none absolute inset-0" />
-          <div className="relative mx-auto max-w-5xl px-5 py-20">
-            <div className="grid items-center gap-10 md:grid-cols-[1.1fr_1fr]">
+          <div className="relative mx-auto max-w-5xl px-6 py-28">
+            <div className="grid items-center gap-12 md:grid-cols-[1.1fr_1fr]">
               <div>
-                <span className="annot text-accent-400">Enfoque deliberado</span>
-                <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">Trazamos el plan. La obra es tuya.</h2>
-                <p className="mt-5 text-lg leading-relaxed text-white/75">
+                <span className="annot text-blueprint-400">Enfoque deliberado</span>
+                <h2 className="mt-3 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">Trazamos el plan. La obra es tuya.</h2>
+                <p className="mt-6 text-lg leading-relaxed text-white/65">
                   El sistema diseña la validación: hipótesis, riesgos, experimentos, métricas y criterios de éxito.
                   No ejecuta experimentos ni espera resultados del mercado — eso es justo lo que acelera el diseño y mejora su calidad.
                 </p>
@@ -206,12 +206,12 @@ export default function Landing() {
                   ["Sí diseña", "Hipótesis, riesgos D/F/V, priorización, experimentos, Test Cards y crítica.", "viab"],
                   ["No ejecuta", "No corre experimentos ni recoge evidencia real. Eso queda como trabajo futuro.", "muted"],
                 ].map(([t, d, tone]) => (
-                  <div key={t as string} className="rounded-2xl border border-white/10 bg-white/[0.06] p-5">
-                    <div className="mb-1 flex items-center gap-2">
-                      <span className={`grid h-6 w-6 place-items-center rounded-full text-sm ${tone === "viab" ? "bg-viab text-white" : "bg-white/15 text-white/70"}`}>{tone === "viab" ? "✓" : "—"}</span>
+                  <div key={t as string} className="rounded-2xl border border-white/10 bg-white/[0.05] p-6">
+                    <div className="mb-1.5 flex items-center gap-2.5">
+                      <span className={`grid h-6 w-6 place-items-center rounded-full text-sm ${tone === "viab" ? "bg-blueprint-500 text-white" : "bg-white/15 text-white/70"}`}>{tone === "viab" ? "✓" : "—"}</span>
                       <span className="font-display font-semibold text-white">{t}</span>
                     </div>
-                    <p className="pl-8 text-sm text-white/65">{d}</p>
+                    <p className="pl-8 text-sm text-white/60">{d}</p>
                   </div>
                 ))}
               </div>
@@ -220,42 +220,42 @@ export default function Landing() {
         </section>
 
         {/* FAQ */}
-        <section id="faq" className="mx-auto max-w-3xl px-5 py-20">
+        <section id="faq" className="mx-auto max-w-3xl px-6 py-28">
           <div className="text-center">
             <span className="annot text-blueprint-600">Preguntas frecuentes</span>
-            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">Lo que la gente pregunta</h2>
+            <h2 className="mt-3 font-display text-4xl font-bold tracking-tight text-ink sm:text-5xl">Lo que la gente pregunta</h2>
           </div>
-          <div className="mt-10 space-y-3">
+          <div className="mt-12 space-y-3">
             {FAQ.map((f, i) => (
               <details key={i} className="card group overflow-hidden p-0 [&_summary::-webkit-details-marker]:hidden">
-                <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-display font-semibold text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blueprint-500">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 px-6 py-5 font-display font-semibold text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blueprint-500">
                   {f.q}
                   <span aria-hidden className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-paper text-ink/60 transition group-open:rotate-45">+</span>
                 </summary>
-                <p className="px-5 pb-5 text-sm leading-relaxed text-ink/65">{f.a}</p>
+                <p className="px-6 pb-6 text-sm leading-relaxed text-ink/60">{f.a}</p>
               </details>
             ))}
           </div>
         </section>
 
         {/* CTA */}
-        <section className="mx-auto max-w-6xl px-5 pb-24">
-          <div className="relative overflow-hidden rounded-3xl border border-blueprint-700 bg-blueprint-700 px-8 py-14 text-center shadow-lift">
+        <section className="mx-auto max-w-6xl px-6 pb-28">
+          <div className="relative overflow-hidden rounded-3xl border border-blueprint-700 bg-blueprint-700 px-8 py-16 text-center shadow-lift">
             <div className="bp-grid-dark pointer-events-none absolute inset-0 opacity-70" />
-            <h2 className="relative font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">Empieza por la hipótesis más riesgosa</h2>
-            <p className="relative mx-auto mt-4 max-w-xl text-lg text-blueprint-100">Crea tu primer proyecto y obtén un blueprint de validación completo hoy.</p>
-            <div className="relative mt-8 flex justify-center"><AuthCta variant="hero" /></div>
+            <h2 className="relative font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">Empieza por la hipótesis más riesgosa</h2>
+            <p className="relative mx-auto mt-5 max-w-xl text-lg text-blueprint-100">Crea tu primer proyecto y obtén un blueprint de validación completo hoy.</p>
+            <div className="relative mt-9 flex justify-center"><AuthCta variant="hero" /></div>
           </div>
         </section>
       </main>
 
       <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 py-8 text-sm text-ink/55 sm:flex-row">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-9 text-sm text-ink/50 sm:flex-row">
           <Logo small />
           <p>Diseño de experimentos de validación · Tesis (Design Science Research)</p>
-          <div className="flex gap-4">
-            <Link href="/login" className="hover:text-ink">Entrar</Link>
-            <Link href="/register" className="hover:text-ink">Crear cuenta</Link>
+          <div className="flex gap-5">
+            <Link href="/login" className="transition-colors hover:text-ink">Entrar</Link>
+            <Link href="/register" className="transition-colors hover:text-ink">Crear cuenta</Link>
           </div>
         </div>
       </footer>
@@ -286,7 +286,7 @@ function HeroMap() {
           <span className="annot absolute bottom-1.5 right-2">con evidencia</span>
           {dots.map((d) => (
             <span key={d.id} className="absolute grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full font-mono text-[9px] font-semibold ring-2 ring-surface"
-              style={{ left: `${d.x}%`, top: `${d.y}%`, width: 22, height: 22, background: d.r ? "#f2b100" : "#0e8fa8", color: d.r ? "#0c1a2e" : "#fff" }}>
+              style={{ left: `${d.x}%`, top: `${d.y}%`, width: 22, height: 22, background: d.r ? "#c9973f" : "#0e8fa8", color: "#fff" }}>
               {d.id}
             </span>
           ))}

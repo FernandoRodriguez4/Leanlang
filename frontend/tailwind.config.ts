@@ -19,15 +19,15 @@ const config: Config = {
         ink: withAlpha("--text"), // texto principal
         line: withAlpha("--border"), // bordes / hairlines
         tint: withAlpha("--tint"), // realce de selección/activo
-        night: "#0c1a2e", // superficie oscura fija (paneles dark)
+        night: "#0a0a0a", // superficie oscura fija (paneles dark)
 
-        // Azul cianotipo — color estructural y de acción
+        // Verde — color estructural y de acción (único acento de marca)
         blueprint: {
-          50: "#eff4ff", 100: "#dbe6fe", 200: "#bfd3fe", 300: "#93b4fd", 400: "#608ffa",
-          500: "#3a6bf4", 600: "#2456e6", 700: "#1d44c0", 800: "#1d3a9b", 900: "#1d357a", 950: "#14224d",
+          50: "#effbf6", 100: "#d7f3e7", 200: "#afe7d0", 300: "#7dd4b3", 400: "#45b48d",
+          500: "#1f9670", 600: "#0f8a5f", 700: "#0c6e4c", 800: "#0f5a40", 900: "#0e4a36", 950: "#082c20",
         },
-        // Ámbar de calco — acento de firma
-        accent: { 300: "#fad776", 400: "#f7c948", 500: "#f2b100", 600: "#d99700", 700: "#b07700" },
+        // Ámbar atenuado — resalte funcional secundario (prioridad / estado), uso moderado
+        accent: { 300: "#e9d7a8", 400: "#dcbb72", 500: "#c9973f", 600: "#a97a2c", 700: "#8a6222" },
 
         // Trío de riesgo (Testing Business Ideas)
         desire: { DEFAULT: "#c97a0e", soft: withAlpha("--desire-soft"), ink: withAlpha("--desire-ink") },
@@ -40,12 +40,12 @@ const config: Config = {
         danger: { DEFAULT: withAlpha("--danger"), soft: withAlpha("--danger-soft"), ink: withAlpha("--danger-ink") },
       },
       boxShadow: {
-        card: "0 1px 2px 0 rgb(12 26 46 / 0.04), 0 2px 6px -1px rgb(12 26 46 / 0.06)",
-        lift: "0 16px 40px -16px rgb(12 26 46 / 0.22)",
-        glow: "0 0 0 1px rgb(36 86 230 / 0.15), 0 14px 40px -14px rgb(36 86 230 / 0.4)",
-        amber: "0 0 0 1px rgb(242 177 0 / 0.25), 0 12px 32px -14px rgb(242 177 0 / 0.5)",
+        card: "0 1px 2px 0 rgb(17 17 17 / 0.03), 0 1px 3px -1px rgb(17 17 17 / 0.05)",
+        lift: "0 20px 44px -20px rgb(17 17 17 / 0.16)",
+        glow: "0 0 0 1px rgb(15 138 95 / 0.16), 0 14px 36px -16px rgb(15 138 95 / 0.35)",
+        amber: "0 0 0 1px rgb(201 151 63 / 0.2), 0 12px 28px -14px rgb(201 151 63 / 0.35)",
       },
-      borderRadius: { xl: "0.75rem", "2xl": "1.1rem" },
+      borderRadius: { xl: "0.625rem", "2xl": "1.25rem" },
       keyframes: {
         "fade-up": { "0%": { opacity: "0", transform: "translateY(10px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },
         "fade-in": { "0%": { opacity: "0" }, "100%": { opacity: "1" } },

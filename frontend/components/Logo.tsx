@@ -18,7 +18,7 @@ export function Logo({ small = false, href = "/", invert = false }: { small?: bo
       </span>
       {!small && (
         <span className={`font-display text-[15px] font-bold tracking-tight ${invert ? "text-white" : "text-ink"}`}>
-          Validation<span className={invert ? "text-accent-400" : "text-blueprint-600"}>Blueprint</span>
+          Validation<span className={invert ? "text-blueprint-400" : "text-blueprint-600"}>Blueprint</span>
         </span>
       )}
     </Link>

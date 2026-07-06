@@ -81,6 +81,12 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
   return handle<T>(res);
 }
 
+/** DELETE sin cuerpo de respuesta (204). */
+export async function apiDelete(path: string): Promise<void> {
+  const res = await fetch(`${API_URL}${path}`, { method: "DELETE", headers: { ...authHeaders() } });
+  if (!res.ok) throw new ApiError(res.status, await friendlyMessage(res));
+}
+
 export async function login(email: string, password: string): Promise<string> {
   const form = new URLSearchParams();
   form.set("username", email);

@@ -38,7 +38,7 @@ export function UserMenu() {
         aria-label="Menú de usuario"
         className="flex items-center gap-2 rounded-xl border border-line bg-surface py-1 pl-1 pr-2 shadow-sm transition hover:border-blueprint-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blueprint-500"
       >
-        <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-blueprint-500 to-feas text-[11px] font-bold text-white">
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-blueprint-600 text-[11px] font-bold text-white">
           {initials(email)}
         </span>
         <span className="hidden max-w-[12ch] truncate text-sm font-medium text-ink/80 sm:inline">{email ?? "cuenta"}</span>

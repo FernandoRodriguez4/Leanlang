@@ -79,7 +79,7 @@ export default function NewProject() {
     <div className="min-h-screen">
       <AppHeader />
       <main id="contenido" className="mx-auto max-w-2xl px-5 py-10">
-        <Link href="/dashboard" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-ink">
+        <Link href="/dashboard" className="mb-4 inline-flex items-center gap-1 text-sm text-ink/55 hover:text-ink">
           ← Volver al panel
         </Link>
         <span className="annot text-blueprint-600">Nuevo plano</span>
@@ -116,7 +116,7 @@ export default function NewProject() {
               { value: "validation", label: "Validación" },
             ]} />
           </div>
-          {error && <p role="alert" className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-700 dark:text-rose-300">{error}</p>}
+          {error && <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger-ink">{error}</p>}
           <div className="flex items-center justify-end gap-3 border-t border-line pt-5">
             <Link href="/dashboard" className="btn-secondary">Cancelar</Link>
             <button className="btn-primary" disabled={loading} aria-busy={loading}>

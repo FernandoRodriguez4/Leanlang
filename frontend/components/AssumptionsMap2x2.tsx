@@ -66,21 +66,21 @@ export function AssumptionsMap2x2({
       >
         <defs>
           <pattern id="grid2x2" width="22" height="22" patternUnits="userSpaceOnUse">
-            <path d="M22 0H0V22" fill="none" stroke="#d2dbea" strokeWidth="0.5" opacity="0.5" />
+            <path d="M22 0H0V22" fill="none" stroke="#e5e7eb" strokeWidth="0.5" opacity="0.6" />
           </pattern>
         </defs>
         <rect x={pad} y={pad} width={W - 2 * pad} height={H - 2 * pad} fill="url(#grid2x2)" />
-        <rect x={pad} y={pad} width={halfW} height={halfH} fill="#f2b100" opacity={0.12} />
-        <text x={pad + 8} y={pad + 18} fontSize={11} fontWeight={600} fill="#b07700" fontFamily="var(--font-mono)">PROBAR PRIMERO</text>
+        <rect x={pad} y={pad} width={halfW} height={halfH} fill="#c9973f" opacity={0.1} />
+        <text x={pad + 8} y={pad + 18} fontSize={11} fontWeight={600} fill="#8a6222" fontFamily="var(--font-mono)">PROBAR PRIMERO</text>
 
-        <line x1={W / 2} y1={pad} x2={W / 2} y2={H - pad} stroke="#c2cde0" strokeWidth={1.5} />
-        <line x1={pad} y1={H / 2} x2={W - pad} y2={H / 2} stroke="#c2cde0" strokeWidth={1.5} />
-        <rect x={pad} y={pad} width={W - 2 * pad} height={H - 2 * pad} fill="none" stroke="#c2cde0" strokeWidth={1.5} />
+        <line x1={W / 2} y1={pad} x2={W / 2} y2={H - pad} stroke="#d1d5db" strokeWidth={1.5} />
+        <line x1={pad} y1={H / 2} x2={W - pad} y2={H / 2} stroke="#d1d5db" strokeWidth={1.5} />
+        <rect x={pad} y={pad} width={W - 2 * pad} height={H - 2 * pad} fill="none" stroke="#d1d5db" strokeWidth={1.5} />
 
-        <text x={pad} y={H - 14} fontSize={10} fill="#1d44c0" opacity={0.7} fontFamily="var(--font-mono)">sin evidencia</text>
-        <text x={W - pad} y={H - 14} fontSize={10} fill="#1d44c0" opacity={0.7} textAnchor="end" fontFamily="var(--font-mono)">con evidencia</text>
-        <text x={pad - 8} y={pad + 2} fontSize={10} fill="#1d44c0" opacity={0.7} transform={`rotate(-90 ${pad - 8} ${pad + 2})`} textAnchor="end" fontFamily="var(--font-mono)">importante</text>
-        <text x={pad - 8} y={H - pad} fontSize={10} fill="#1d44c0" opacity={0.7} transform={`rotate(-90 ${pad - 8} ${H - pad})`} fontFamily="var(--font-mono)">poco import.</text>
+        <text x={pad} y={H - 14} fontSize={10} fill="#111111" opacity={0.5} fontFamily="var(--font-mono)">sin evidencia</text>
+        <text x={W - pad} y={H - 14} fontSize={10} fill="#111111" opacity={0.5} textAnchor="end" fontFamily="var(--font-mono)">con evidencia</text>
+        <text x={pad - 8} y={pad + 2} fontSize={10} fill="#111111" opacity={0.5} transform={`rotate(-90 ${pad - 8} ${pad + 2})`} textAnchor="end" fontFamily="var(--font-mono)">importante</text>
+        <text x={pad - 8} y={H - pad} fontSize={10} fill="#111111" opacity={0.5} transform={`rotate(-90 ${pad - 8} ${H - pad})`} fontFamily="var(--font-mono)">poco import.</text>
 
         {items.map((p) => {
           const cx = x(p.evidence), cy = y(p.importance);
@@ -105,10 +105,10 @@ export function AssumptionsMap2x2({
               }
             >
               {editable && dragId === p.hypothesis_id && (
-                <circle cx={cx} cy={cy} r={18} fill="#2456e6" opacity={0.12} />
+                <circle cx={cx} cy={cy} r={18} fill="#0f8a5f" opacity={0.12} />
               )}
-              <circle cx={cx} cy={cy} r={12} fill={p.is_riskiest ? "#f2b100" : "#0e8fa8"} stroke="#fff" strokeWidth={2.5} />
-              <text x={cx} y={cy + 3.5} fontSize={9} fontWeight={700} fill={p.is_riskiest ? "#0c1a2e" : "#fff"} textAnchor="middle" fontFamily="var(--font-mono)" pointerEvents="none">
+              <circle cx={cx} cy={cy} r={12} fill={p.is_riskiest ? "#c9973f" : "#0e8fa8"} stroke="#fff" strokeWidth={2.5} />
+              <text x={cx} y={cy + 3.5} fontSize={9} fontWeight={700} fill="#fff" textAnchor="middle" fontFamily="var(--font-mono)" pointerEvents="none">
                 {p.hypothesis_id}
               </text>
             </g>

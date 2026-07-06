@@ -1,0 +1,9 @@
+Vercel Labs Agent Skills — License
+Source: https://github.com/vercel-labs/agent-skills
+
+Las skills declaran 'license: MIT' en su frontmatter SKILL.md.
+Seccion License del README del repo:
+---
+## License
+
+MIT
