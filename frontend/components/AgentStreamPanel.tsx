@@ -4,6 +4,7 @@ import { useState } from "react";
 
 const AGENT_LABEL: Record<string, string> = {
   supervisor: "Supervisor / Triaje",
+  research: "Investigador (Tavily)",
   problem: "Problem Agent",
   customer_segment: "Customer Segment Agent",
   value_proposition: "Value Proposition Agent",

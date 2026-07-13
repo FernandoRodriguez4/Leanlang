@@ -3,7 +3,8 @@ r"""Construccion del grafo del enjambre multiagente (LangGraph StateGraph).
 Arquitectura: Supervisor (orquestador, dueno del proceso) + Triaje (route_entry decide
 que agente cubre la tarea) + 14 Lean Agents, con bucle del Critico e interrupts human-in-the-loop.
 
-    START -> supervisor -(triaje)-> problem | hypotheses | risk
+    START -> supervisor -(triaje)-> research | problem | hypotheses | risk
+    research -> problem
     problem -> customer_segment -> value_proposition -> business_model -> hypotheses
     hypotheses -> [interrupt] human_hypotheses -> risk            (Risk Agent: tipo+nivel+2x2)
     risk -> [interrupt] human_prioritization -> experiment_design
@@ -26,6 +27,7 @@ from app.agents.metrics import metrics_node
 from app.agents.plan_estimate import plan_estimate_node
 from app.agents.problem import problem_node
 from app.agents.report import report_node
+from app.agents.research import research_node
 from app.agents.risk import risk_node
 from app.agents.sequencing import sequencing_node
 from app.agents.success_criteria import success_criteria_node
@@ -52,6 +54,7 @@ def make_graph_builder() -> StateGraph:
 
     # Orquestador + triaje
     g.add_node("supervisor", supervisor_node)
+    g.add_node("research", research_node)
     # Lean Agents (enjambre)
     g.add_node("problem", problem_node)
     g.add_node("customer_segment", customer_segment_node)
@@ -76,8 +79,9 @@ def make_graph_builder() -> StateGraph:
     g.add_conditional_edges(
         "supervisor",
         route_entry,
-        {"problem": "problem", "hypotheses": "hypotheses", "risk": "risk"},
+        {"research": "research", "problem": "problem", "hypotheses": "hypotheses", "risk": "risk"},
     )
+    g.add_edge("research", "problem")
 
     # Lado del cliente (VPC distribuido) + modelo de negocio (BMC)
     g.add_edge("problem", "customer_segment")

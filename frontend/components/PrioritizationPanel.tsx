@@ -40,20 +40,20 @@ export function PrioritizationPanel({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <AssumptionsMap2x2 items={view} editable={editable} onMove={handleMove} />
 
       <div className="card p-5">
-        <div className="mb-3 flex items-center gap-2">
-          <span className="badge bg-accent-500 text-ink">▲ probar primero</span>
-          <span className="annot">{riskiest.length} de {view.length} hipótesis</span>
+        <div className="mb-4 flex items-center gap-2 border-b border-line pb-3">
+          <span className="badge ml-2 bg-accent-500 text-ink">▲ probar primero</span>
+          <span className="annot text-sm font-bold text-ink">{riskiest.length} de {view.length} hipótesis</span>
         </div>
         {riskiest.length ? (
-          <ol className="space-y-2">
+          <ol className="divide-y divide-line">
             {riskiest.map((p) => (
-              <li key={p.hypothesis_id} className="flex gap-2 text-sm">
-                <span className="font-mono text-xs font-semibold text-accent-700">{p.hypothesis_id}</span>
-                <span className="text-ink/75">{hMap[p.hypothesis_id]}</span>
+              <li key={p.hypothesis_id} className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0 text-sm">
+                <span className="mt-0.5 shrink-0 rounded-md bg-accent-500/15 px-1.5 py-0.5 font-mono text-xs font-bold text-accent-700">{p.hypothesis_id}</span>
+                <span className="leading-relaxed text-ink/80">{hMap[p.hypothesis_id]}</span>
               </li>
             ))}
           </ol>

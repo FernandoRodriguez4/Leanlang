@@ -11,12 +11,14 @@ import { AppHeader } from "@/components/AppHeader";
 import { AgentStreamPanel, TraceItem } from "@/components/AgentStreamPanel";
 import { BlueprintNav, NavStage } from "@/components/BlueprintNav";
 import { HypothesisList } from "@/components/HypothesisList";
+import { HypothesisRoadmap } from "@/components/HypothesisRoadmap";
 import { PrioritizationPanel } from "@/components/PrioritizationPanel";
 import { ExperimentsPanel } from "@/components/ExperimentsPanel";
 import { TestCardsPanel } from "@/components/TestCardsPanel";
 import { CriticReviewView } from "@/components/CriticReview";
 import dynamic from "next/dynamic";
 import { OverviewPanel } from "@/components/OverviewPanel";
+import { ResearchPanel } from "@/components/ResearchPanel";
 import { LienzoPanel } from "@/components/LienzoPanel";
 import { ReportPanel } from "@/components/ReportPanel";
 import { VersionSelect, BlueprintVersion } from "@/components/VersionSelect";
@@ -28,10 +30,11 @@ const CompareView = dynamic(() => import("@/components/CompareView").then((m) =>
 });
 
 type Phase = "loading" | "idle" | "running" | "interrupt" | "done" | "error";
-type StageKey = "resumen" | "lienzo" | "hypotheses" | "risk" | "experiments" | "testcards" | "critic" | "report";
+type StageKey = "investigacion" | "resumen" | "lienzo" | "hypotheses" | "risk" | "experiments" | "testcards" | "critic" | "report";
 
 const STAGE_DEFS: { key: StageKey; label: string; blurb: string }[] = [
   { key: "resumen", label: "Resumen", blurb: "Panorama del blueprint y accesos directos." },
+  { key: "investigacion", label: "Investigación", blurb: "Evidencia externa recopilada antes de trazar el blueprint." },
   { key: "lienzo", label: "Lienzo", blurb: "Problema, segmento objetivo y propuesta de valor." },
   { key: "hypotheses", label: "Hipótesis", blurb: "Supuestos clave como hipótesis testables, etiquetadas por riesgo." },
   { key: "risk", label: "Riesgo", blurb: "Tipo y nivel de riesgo, y qué probar primero (mapa 2×2)." },
@@ -49,6 +52,7 @@ const GATE_STAGE: Record<string, StageKey> = {
 
 function readyFor(bp: Blueprint, key: StageKey): boolean {
   switch (key) {
+    case "investigacion": return !!bp.research;
     case "resumen": return !!bp.problem || !!bp.hypotheses?.length;
     case "lienzo": return !!bp.problem || !!bp.customer_segment || !!bp.value_proposition;
     case "hypotheses": return !!bp.hypotheses?.length;
@@ -82,6 +86,7 @@ function inferInterrupt(bp: Blueprint): string | null {
 
 function deriveTrace(bp: Blueprint): TraceItem[] {
   const t: TraceItem[] = [];
+  if (bp.research) t.push({ node: "research", trace: "Investigación de evidencia externa." });
   if (bp.problem) t.push({ node: "problem", trace: "Problema estructurado." });
   if (bp.customer_segment) t.push({ node: "customer_segment", trace: "Segmento definido." });
   if (bp.value_proposition) t.push({ node: "value_proposition", trace: "Propuesta de valor." });
@@ -231,9 +236,19 @@ export default function Workspace() {
 
   async function resume(stage: string, payload: Record<string, unknown>) {
     if (!blueprintId) return;
-    setPhase("running"); setInterruptType(null); setReadOnly(false); pinned.current = false;
-    try { await resumeBlueprint(blueprintId, stage, payload, onEvent); }
-    catch (e) { setError(e instanceof Error ? e.message : "Error"); setPhase("error"); }
+    const prevInterrupt = interruptType;
+    setError(""); setPhase("running"); setInterruptType(null); setReadOnly(false); pinned.current = false;
+    try {
+      await resumeBlueprint(blueprintId, stage, payload, onEvent);
+    } catch (e) {
+      // El backend puede rechazar el resume (ej. 422 al editar hipotesis) antes de
+      // abrir el stream. Volvemos al mismo interrupt en vez de "error": el usuario
+      // no debe perder su edicion ni terminar en la pantalla de "Reintentar" (que
+      // reinicia el blueprint completo desde cero).
+      setError(e instanceof Error ? e.message : "Error");
+      setInterruptType(prevInterrupt);
+      setPhase("interrupt");
+    }
     refreshVersions();
   }
 
@@ -324,7 +339,7 @@ export default function Workspace() {
             <section id="stage-panel" role="tabpanel" aria-label={def.label} aria-busy={phase === "running"} className="min-w-0">
               <div className="mb-4">
                 <h2 className="font-display text-xl font-bold tracking-tight text-ink">{def.label}</h2>
-                <p className="mt-0.5 text-sm text-ink/60">{def.blurb}</p>
+                <p className={`text-sm text-ink/60 ${activeKey === "risk" ? "mt-2" : "mt-0.5"}`}>{def.blurb}</p>
               </div>
               <div key={activeKey} className="animate-fade-in">
                 <StagePanel
@@ -355,9 +370,17 @@ function StagePanel({
   onFocusHyp: (hid: string) => void;
   onExport: (f: "md" | "json") => void;
 }) {
+  // Única fuente de verdad para la colección de hipótesis en revisión: la comparten
+  // la lista de tarjetas y el Roadmap, evitando estado paralelo entre ambos.
+  const [editedHyps, setEditedHyps] = useState<Hypothesis[]>(() => (bp.hypotheses as Hypothesis[]) || []);
+  useEffect(() => setEditedHyps((bp.hypotheses as Hypothesis[]) || []), [bp.hypotheses]);
+
   if (!readyFor(bp, stageKey)) return <Working />;
 
   switch (stageKey) {
+    case "investigacion":
+      return <ResearchPanel report={bp.research!} />;
+
     case "resumen":
       return <OverviewPanel bp={bp} onJump={onJump} />;
 
@@ -366,16 +389,32 @@ function StagePanel({
 
     case "hypotheses":
       return (
-        <div className="space-y-4">
-          <RiskLegend bp={bp} />
-          <HypothesisList
-            hypotheses={bp.hypotheses as Hypothesis[]}
+        <div className="space-y-6">
+          <HypothesisRoadmap
+            hypotheses={editedHyps}
             classifications={bp.classifications}
             prioritization={bp.prioritization}
-            editable={interruptType === "review_hypotheses"}
-            onConfirm={(edited) => onResume("hypotheses", { hypotheses: edited })}
-            onFocusHyp={onFocusHyp}
+            recommendations={bp.recommendations}
+            metricSpecs={bp.metric_specs}
+            successCriteria={bp.success_criteria}
+            decisions={bp.decisions}
           />
+
+          <div className="border-t border-line pt-6">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <h3 className="font-display text-sm font-semibold text-ink/70">Lista de hipótesis</h3>
+              <RiskLegend bp={bp} />
+            </div>
+            <HypothesisList
+              hypotheses={editedHyps}
+              classifications={bp.classifications}
+              prioritization={bp.prioritization}
+              editable={interruptType === "review_hypotheses"}
+              onChange={setEditedHyps}
+              onConfirm={(edited) => onResume("hypotheses", { hypotheses: edited })}
+              onFocusHyp={onFocusHyp}
+            />
+          </div>
         </div>
       );
 

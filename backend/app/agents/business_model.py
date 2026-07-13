@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from app.agents.base import jdump, trace
+from app.agents.base import jdump, research_context, trace
 from app.agents.prompts import BUSINESS_MODEL_PROMPT_VERSION, BUSINESS_MODEL_SYSTEM
 from app.core.llm import get_structured_model
 from app.schemas.lean import BusinessModel
@@ -17,9 +17,11 @@ def business_model_node(state: BlueprintState) -> dict:
         "customer_segment": state.get("customer_segment", {}),
         "value_proposition": state.get("value_proposition", {}),
     }
+    evidence = research_context(state)
+    prefix = f"Evidencia externa disponible:\n{evidence}\n\n" if evidence else ""
     msgs = [
         SystemMessage(content=BUSINESS_MODEL_SYSTEM),
-        HumanMessage(content=f"Estructura el modelo de negocio (bloques BMC) para:\n\n{jdump(context)}"),
+        HumanMessage(content=f"{prefix}Estructura el modelo de negocio (bloques BMC) para:\n\n{jdump(context)}"),
     ]
     bm: BusinessModel = model.invoke(msgs)
     return {

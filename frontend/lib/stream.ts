@@ -18,7 +18,7 @@ async function streamSSE(
     },
     body: JSON.stringify(body),
   });
-  if (!res.ok || !res.body) throw new Error(await res.text());
+  if (!res.ok || !res.body) throw new Error(await _errorMessage(res));
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
@@ -38,6 +38,19 @@ async function streamSSE(
       if (parsed) onEvent(parsed);
     }
   }
+}
+
+// El backend puede rechazar el request antes de abrir el stream (ej. 422 al editar
+// hipotesis) devolviendo JSON {detail: "..."} en vez de text/event-stream.
+async function _errorMessage(res: Response): Promise<string> {
+  const text = await res.text();
+  try {
+    const data = JSON.parse(text);
+    if (typeof data.detail === "string") return data.detail;
+  } catch {
+    // no era JSON: se usa el texto crudo
+  }
+  return text;
 }
 
 function parseBlock(raw: string): SSEEvent | null {

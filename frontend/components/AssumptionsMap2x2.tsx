@@ -46,8 +46,8 @@ export function AssumptionsMap2x2({
   return (
     <div className="card p-5">
       <div className="mb-1 flex items-center justify-between">
-        <h3 className="font-display font-semibold text-ink">Mapa de supuestos</h3>
-        <span className="annot">importancia × evidencia</span>
+        <h3 className="font-display font-bold uppercase text-ink">Mapa de supuestos</h3>
+        <span className="annot font-bold text-ink/70">importancia × evidencia</span>
       </div>
       <p className="mb-4 text-sm text-ink/60">
         {editable
@@ -66,21 +66,22 @@ export function AssumptionsMap2x2({
       >
         <defs>
           <pattern id="grid2x2" width="22" height="22" patternUnits="userSpaceOnUse">
-            <path d="M22 0H0V22" fill="none" stroke="#e5e7eb" strokeWidth="0.5" opacity="0.6" />
+            <path d="M22 0H0V22" fill="none" stroke="#c7cdd4" strokeWidth="0.6" opacity="0.7" />
           </pattern>
         </defs>
         <rect x={pad} y={pad} width={W - 2 * pad} height={H - 2 * pad} fill="url(#grid2x2)" />
-        <rect x={pad} y={pad} width={halfW} height={halfH} fill="#c9973f" opacity={0.1} />
-        <text x={pad + 8} y={pad + 18} fontSize={11} fontWeight={600} fill="#8a6222" fontFamily="var(--font-mono)">PROBAR PRIMERO</text>
+        <rect x={pad} y={pad} width={halfW} height={halfH} fill="#c9973f" opacity={0.16} stroke="#c9973f" strokeWidth={1} strokeOpacity={0.5} strokeDasharray="4 3" />
+        <rect x={pad + 6} y={pad + 6} width={104} height={18} rx={4} fill="#c9973f" />
+        <text x={pad + 12} y={pad + 18.5} fontSize={10.5} fontWeight={700} fill="#ffffff" fontFamily="var(--font-mono)" letterSpacing="0.3">PROBAR PRIMERO</text>
 
-        <line x1={W / 2} y1={pad} x2={W / 2} y2={H - pad} stroke="#d1d5db" strokeWidth={1.5} />
-        <line x1={pad} y1={H / 2} x2={W - pad} y2={H / 2} stroke="#d1d5db" strokeWidth={1.5} />
-        <rect x={pad} y={pad} width={W - 2 * pad} height={H - 2 * pad} fill="none" stroke="#d1d5db" strokeWidth={1.5} />
+        <line x1={W / 2} y1={pad} x2={W / 2} y2={H - pad} stroke="#9aa4b0" strokeWidth={1.5} />
+        <line x1={pad} y1={H / 2} x2={W - pad} y2={H / 2} stroke="#9aa4b0" strokeWidth={1.5} />
+        <rect x={pad} y={pad} width={W - 2 * pad} height={H - 2 * pad} fill="none" stroke="#9aa4b0" strokeWidth={1.5} />
 
-        <text x={pad} y={H - 14} fontSize={10} fill="#111111" opacity={0.5} fontFamily="var(--font-mono)">sin evidencia</text>
-        <text x={W - pad} y={H - 14} fontSize={10} fill="#111111" opacity={0.5} textAnchor="end" fontFamily="var(--font-mono)">con evidencia</text>
-        <text x={pad - 8} y={pad + 2} fontSize={10} fill="#111111" opacity={0.5} transform={`rotate(-90 ${pad - 8} ${pad + 2})`} textAnchor="end" fontFamily="var(--font-mono)">importante</text>
-        <text x={pad - 8} y={H - pad} fontSize={10} fill="#111111" opacity={0.5} transform={`rotate(-90 ${pad - 8} ${H - pad})`} fontFamily="var(--font-mono)">poco import.</text>
+        <text x={pad} y={H - 14} fontSize={11} fontWeight={600} fill="#111111" opacity={0.7} fontFamily="var(--font-mono)">sin evidencia</text>
+        <text x={W - pad} y={H - 14} fontSize={11} fontWeight={600} fill="#111111" opacity={0.7} textAnchor="end" fontFamily="var(--font-mono)">con evidencia</text>
+        <text x={pad - 8} y={pad + 2} fontSize={11} fontWeight={600} fill="#111111" opacity={0.7} transform={`rotate(-90 ${pad - 8} ${pad + 2})`} textAnchor="end" fontFamily="var(--font-mono)">muy importante</text>
+        <text x={pad - 8} y={H - pad} fontSize={11} fontWeight={600} fill="#111111" opacity={0.7} transform={`rotate(-90 ${pad - 8} ${H - pad})`} fontFamily="var(--font-mono)">poco importante</text>
 
         {items.map((p) => {
           const cx = x(p.evidence), cy = y(p.importance);
@@ -105,19 +106,19 @@ export function AssumptionsMap2x2({
               }
             >
               {editable && dragId === p.hypothesis_id && (
-                <circle cx={cx} cy={cy} r={18} fill="#0f8a5f" opacity={0.12} />
+                <circle cx={cx} cy={cy} r={20} fill="#0f8a5f" opacity={0.12} />
               )}
-              <circle cx={cx} cy={cy} r={12} fill={p.is_riskiest ? "#c9973f" : "#0e8fa8"} stroke="#fff" strokeWidth={2.5} />
-              <text x={cx} y={cy + 3.5} fontSize={9} fontWeight={700} fill="#fff" textAnchor="middle" fontFamily="var(--font-mono)" pointerEvents="none">
+              <circle cx={cx} cy={cy} r={14} fill={p.is_riskiest ? "#c9973f" : "#0e8fa8"} stroke="#fff" strokeWidth={3} />
+              <text x={cx} y={cy + 3.5} fontSize={10} fontWeight={700} fill="#fff" textAnchor="middle" fontFamily="var(--font-mono)" pointerEvents="none">
                 {p.hypothesis_id}
               </text>
             </g>
           );
         })}
       </svg>
-      <div className="mt-3 flex items-center justify-center gap-5 text-xs text-ink/60">
-        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-accent-500" /> probar primero</span>
-        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-feas" /> resto</span>
+      <div className="mt-3 flex items-center justify-center gap-5 border-t border-line pt-3 text-xs">
+        <span className="inline-flex items-center gap-1.5 font-semibold text-ink/80"><span className="h-2.5 w-2.5 rounded-full bg-accent-500" /> probar primero</span>
+        <span className="inline-flex items-center gap-1.5 font-semibold text-ink/80"><span className="h-2.5 w-2.5 rounded-full bg-feas" /> resto</span>
       </div>
     </div>
   );

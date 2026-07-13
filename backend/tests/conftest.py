@@ -41,6 +41,7 @@ from app.schemas.measurement import (  # noqa: E402
     SuccessCriterionList,
 )
 from app.schemas.report import Report  # noqa: E402
+from app.schemas.research import ResearchPlan  # noqa: E402
 from app.schemas.roadmap import RoadmapPhase, ValidationRoadmap  # noqa: E402
 from app.schemas.testcard import CriticReview  # noqa: E402
 
@@ -51,6 +52,7 @@ def _canned(schema):
         return Problem(
             statement="Los padres millennials no encuentran kits de ciencia listos y asequibles.",
             context="Padres con poco tiempo para preparar proyectos escolares.",
+            context_summary="Padres ocupados sin tiempo para preparar proyectos escolares.",
             customer_jobs=["preparar proyecto de ciencias"],
             pains=["sin tiempo", "materiales dispersos"],
         )
@@ -58,9 +60,11 @@ def _canned(schema):
         return CustomerSegment(
             name="Padres millennials",
             description="Padres 28-42 con hijos en primaria.",
+            description_summary="Padres de 28 a 42 años con hijos en primaria.",
             characteristics=["ocupados", "digitales"],
             gains=["nota alta", "tiempo en familia"],
             early_adopters="Padres que ya compran material educativo online",
+            early_adopters_summary="Padres que ya compran material educativo online.",
         )
     if schema is ValueProposition:
         return ValueProposition(
@@ -69,6 +73,7 @@ def _canned(schema):
             pain_relievers=["todo incluido"],
             gain_creators=["proyectos exitosos"],
             differentiator="Curados por docentes",
+            differentiator_summary="Curados por docentes.",
         )
     if schema is BusinessModel:
         return BusinessModel(
@@ -126,6 +131,10 @@ def _canned(schema):
         ], rationale="Barato y rápido primero, triangulando h1.")
     if schema is CriticReview:
         return CriticReview(quality_score=0.82, passed=True, issues=[], summary="Diseno solido.")
+    if schema is ResearchPlan:
+        # execute=False: el gate del Supervisor no dispara el nodo `research` en los
+        # tests del grafo (ese nodo aun no esta registrado en build_graph.py -- Fase 6).
+        return ResearchPlan(execute=False, queries=[])
     if schema is Report:
         return Report(
             executive_summary="Plan enfocado en validar disposicion a pagar y factibilidad de envio.",
@@ -162,13 +171,15 @@ def fake_llm(monkeypatch):
     import app.agents.risk as risk
     import app.agents.sequencing as sequencing
     import app.agents.success_criteria as success_criteria
+    import app.agents.supervisor as supervisor
     import app.agents.value_proposition as value_proposition
 
     def fake_get_structured_model(schema, temperature=None):
         return _FakeStructured(schema)
 
     for mod in (problem, customer_segment, value_proposition, business_model, hypotheses, risk,
-                experiment_design, metrics, success_criteria, decision, sequencing, critic, report):
+                experiment_design, metrics, success_criteria, decision, sequencing, critic, report,
+                supervisor):
         monkeypatch.setattr(mod, "get_structured_model", fake_get_structured_model)
     return fake_get_structured_model
 

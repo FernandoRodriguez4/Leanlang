@@ -9,6 +9,7 @@ export type Quadrant = "test_now" | "keep_evidence" | "deprioritize" | "park";
 export interface Problem {
   statement: string;
   context: string;
+  context_summary?: string;
   root_causes: string[];
   customer_jobs: string[];
   pains: string[];
@@ -16,9 +17,11 @@ export interface Problem {
 export interface CustomerSegment {
   name: string;
   description: string;
+  description_summary?: string;
   characteristics: string[];
   gains: string[];
   early_adopters: string;
+  early_adopters_summary?: string;
 }
 export interface ValueProposition {
   statement: string;
@@ -26,6 +29,7 @@ export interface ValueProposition {
   pain_relievers: string[];
   gain_creators: string[];
   differentiator: string;
+  differentiator_summary?: string;
 }
 export interface BusinessModel {
   channels: string[];
@@ -165,6 +169,33 @@ export interface CriticReview {
   summary: string;
 }
 
+// — Agente Investigador (Tavily) —
+export interface Source {
+  title: string;
+  url: string;
+  snippet: string;
+}
+
+export interface Competitor {
+  name: string;
+  description: string;
+  url?: string | null;
+}
+
+export interface ResearchReport {
+  status: string;
+  confidence: string;
+  generated_at: string;
+  queries: string[];
+  market_summary: string;
+  competitors: Competitor[];
+  trends: string[];
+  benchmarks: string[];
+  regulations: string[];
+  studies: string[];
+  sources: Source[];
+}
+
 export interface Blueprint {
   problem?: Problem;
   customer_segment?: CustomerSegment;
@@ -182,6 +213,7 @@ export interface Blueprint {
   test_cards?: TestCard[];
   critic_review?: CriticReview;
   report?: Report;
+  research?: ResearchReport;
 }
 
 // Eventos SSE

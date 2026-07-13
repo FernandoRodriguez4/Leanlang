@@ -28,3 +28,14 @@ def prune_messages(messages: list[BaseMessage], *, window: int) -> list[RemoveMe
 def jdump(obj: Any) -> str:
     """Serializa a JSON legible para meter contexto en los prompts."""
     return json.dumps(obj, ensure_ascii=False, indent=2)
+
+
+def research_context(state: dict) -> str:
+    """Serializa `state["research"]` (ResearchReport) para inyectarlo como evidencia
+    externa en los prompts. Devuelve "" si aun no hay investigacion (aditivo: el
+    prompt queda identico al actual cuando no hay research).
+    """
+    research = state.get("research")
+    if not research:
+        return ""
+    return jdump(research)

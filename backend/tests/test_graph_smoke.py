@@ -66,3 +66,52 @@ def test_human_edits_override_hypotheses(fake_llm):
     graph.invoke(Command(resume={"hypotheses": edited}), config=config)
     snap = graph.get_state(config)
     assert snap.values["hypotheses"][0]["statement"] == "Hipotesis editada por el usuario"
+
+
+def test_human_deletes_hypotheses(fake_llm):
+    """El array editado puede tener menos elementos: eliminar es solo un reemplazo
+    completo de `state["hypotheses"]` con una lista mas corta (ver
+    docs/audit_elimin_hipotesis.md)."""
+    graph = build_blueprint_graph(MemorySaver())
+    config = {"configurable": {"thread_id": "t-delete"}}
+    graph.invoke(_initial_state(), config=config)
+    snap = graph.get_state(config)
+    assert len(snap.values["hypotheses"]) == 3
+
+    remaining = [h for h in snap.values["hypotheses"] if h["id"] != "h2"]
+    graph.invoke(Command(resume={"hypotheses": remaining}), config=config)
+    snap = graph.get_state(config)
+    assert len(snap.values["hypotheses"]) == 2
+    assert {h["id"] for h in snap.values["hypotheses"]} == {"h1", "h3"}
+
+    # Los nodos posteriores (Risk) solo ven las hipotesis restantes.
+    assert "human_prioritization" in snap.next
+    class_ids = {c["hypothesis_id"] for c in snap.values["classifications"]}
+    assert class_ids <= {"h1", "h3"}
+
+
+def test_human_delete_last_hypothesis_leaves_two(fake_llm):
+    """Caso limite permitido: 2 -> 1 (siempre que quede al menos una)."""
+    graph = build_blueprint_graph(MemorySaver())
+    config = {"configurable": {"thread_id": "t-delete-to-one"}}
+    graph.invoke(_initial_state(), config=config)
+
+    remaining = [{"id": "h1", "statement": "H1", "source_block": "value_propositions", "is_counter_hypothesis": False}]
+    graph.invoke(Command(resume={"hypotheses": remaining}), config=config)
+    snap = graph.get_state(config)
+    assert len(snap.values["hypotheses"]) == 1
+    assert snap.values["hypotheses"][0]["id"] == "h1"
+
+
+def test_human_confirms_hypotheses_without_editing(fake_llm):
+    """Resume sin la clave 'hypotheses' (ej. {'accepted': True}) mantiene el state
+    tal cual: el nodo confia en la forma del payload, la validacion vive en el
+    endpoint HTTP (ver tests/test_resume_validation.py y app/api/routes/blueprint.py)."""
+    graph = build_blueprint_graph(MemorySaver())
+    config = {"configurable": {"thread_id": "t-accept"}}
+    graph.invoke(_initial_state(), config=config)
+    before = graph.get_state(config)
+
+    graph.invoke(Command(resume={"accepted": True}), config=config)
+    snap = graph.get_state(config)
+    assert snap.values["hypotheses"] == before.values["hypotheses"]

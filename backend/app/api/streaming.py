@@ -14,6 +14,7 @@ from typing import Any
 from langchain_core.messages import RemoveMessage
 
 ARTIFACT_FIELDS = [
+    "research",
     "problem",
     "customer_segment",
     "value_proposition",

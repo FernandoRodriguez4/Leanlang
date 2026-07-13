@@ -32,7 +32,7 @@ export function ExperimentSequence({ recs }: { recs: ExperimentRec[] }) {
                   <span className={`h-1.5 w-1.5 rounded-full ${disc ? "bg-blueprint-500" : "bg-accent-500"}`} />
                   {disc ? "Descubrimiento" : "Validación"}
                 </span>
-                <span className="badge bg-paper font-mono text-ink/55">{r.hypothesis_id}</span>
+                <span className="rounded-md bg-accent-500/15 px-1.5 py-0.5 font-mono text-xs font-bold text-accent-700">{r.hypothesis_id}</span>
               </div>
               <p className="mt-1.5 text-sm leading-relaxed text-ink/65">{r.rationale}</p>
               {r.design_detail && (

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import type { Classification, Hypothesis, Prioritization } from "@/lib/types";
 import { RiskBadge } from "./RiskBadges";
 import { RiskLevelBadge } from "./Status";
@@ -11,20 +10,25 @@ interface Props {
   classifications?: Classification[];
   prioritization?: Prioritization[];
   editable?: boolean;
+  onChange?: (edited: Hypothesis[]) => void;
   onConfirm?: (edited: Hypothesis[]) => void;
   onFocusHyp?: (id: string) => void;
 }
 
-export function HypothesisList({ hypotheses, classifications, prioritization, editable, onConfirm, onFocusHyp }: Props) {
-  const [items, setItems] = useState<Hypothesis[]>(hypotheses);
-  useEffect(() => setItems(hypotheses), [hypotheses]);
-
+export function HypothesisList({ hypotheses, classifications, prioritization, editable, onChange, onConfirm, onFocusHyp }: Props) {
+  const items = hypotheses;
+  const atMinimum = items.length <= 1;
   const riskByH = Object.fromEntries((classifications || []).map((c) => [c.hypothesis_id, c.risk_type]));
   const levelByH = Object.fromEntries((classifications || []).map((c) => [c.hypothesis_id, c.risk_level]));
   const prioByH = Object.fromEntries((prioritization || []).map((p) => [p.hypothesis_id, p]));
 
   function update(i: number, statement: string) {
-    setItems((prev) => prev.map((h, idx) => (idx === i ? { ...h, statement } : h)));
+    onChange?.(items.map((h, idx) => (idx === i ? { ...h, statement } : h)));
+  }
+
+  function remove(i: number) {
+    if (items.length <= 1) return;
+    onChange?.(items.filter((_, idx) => idx !== i));
   }
 
   return (
@@ -55,7 +59,21 @@ export function HypothesisList({ hypotheses, classifications, prioritization, ed
                 <span className="badge bg-blueprint-500/15 text-blueprint-700 dark:text-blueprint-300">↺ contra-hipótesis</span>
               )}
               {prio?.is_riskiest && (
-                <span className="badge ml-auto bg-accent-500 text-ink">▲ probar primero</span>
+                <span className={`badge ${editable ? "" : "ml-auto"} bg-accent-500 text-ink`}>▲ probar primero</span>
+              )}
+              {editable && (
+                <button
+                  type="button"
+                  onClick={() => remove(i)}
+                  disabled={atMinimum}
+                  aria-label={`Eliminar ${h.id}`}
+                  title={atMinimum ? "Debe existir al menos una hipótesis para continuar." : `Eliminar ${h.id}`}
+                  className="ml-auto grid h-8 w-8 place-items-center rounded-lg border border-danger bg-surface text-danger transition duration-200 hover:bg-danger hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-surface disabled:hover:text-danger"
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M4 7h16M9 7V4.8c0-.44.36-.8.8-.8h4.4c.44 0 .8.36.8.8V7m-9 0 .7 12.1a2 2 0 0 0 2 1.9h5.6a2 2 0 0 0 2-1.9L18 7M10 11v6M14 11v6" />
+                  </svg>
+                </button>
               )}
             </div>
             {editable ? (
@@ -76,6 +94,11 @@ export function HypothesisList({ hypotheses, classifications, prioritization, ed
           </div>
         );
       })}
+      {editable && atMinimum && (
+        <p role="alert" className="text-sm font-medium text-danger-ink">
+          Debe existir al menos una hipótesis para continuar.
+        </p>
+      )}
       {editable && onConfirm && (
         <button onClick={() => onConfirm(items)} className="btn-amber w-full sm:w-auto">
           Confirmar hipótesis y continuar →

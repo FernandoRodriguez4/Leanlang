@@ -6,6 +6,7 @@ import warnings
 
 from fastapi import APIRouter, Depends, HTTPException
 from langgraph.types import Command
+from pydantic import ValidationError
 from sse_starlette.sse import EventSourceResponse
 from sqlalchemy.orm import Session
 
@@ -17,6 +18,7 @@ from app.db.models import Blueprint, Project, User
 from app.db.session import SessionLocal, get_db
 from app.graph.runtime import get_graph
 from app.schemas.api import BlueprintRunRequest, ResumeRequest
+from app.schemas.hypothesis import HypothesisList
 
 router = APIRouter(tags=["blueprint"])
 
@@ -36,6 +38,31 @@ def _own_blueprint(db: Session, blueprint_id: str, user: User) -> Blueprint:
     if not project or project.user_id != user.id:
         raise HTTPException(status_code=404, detail="Blueprint no encontrado")
     return bp
+
+
+def _validate_hypotheses_edit(hypotheses: object) -> list[dict]:
+    """Valida el array editado de hipotesis ANTES de reanudar el grafo.
+
+    Reutiliza el schema `Hypothesis`/`HypothesisList` (forma + campos) y agrega las
+    reglas de negocio de la edicion humana: ids unicos y al menos una hipotesis
+    (un Blueprint no puede continuar la revision sin ninguna). Se valida aca, en el
+    borde HTTP, y no dentro de `human_hypotheses_node`: un error levantado *despues*
+    de que `interrupt()` ya devolvio el valor deja ese valor fijado para siempre en
+    el checkpoint de LangGraph, y cualquier resume posterior (incluso uno valido)
+    vuelve a repetir el mismo intento fallido. Validando antes de construir el
+    `Command(resume=...)` nos aseguramos de que un payload invalido nunca llegue a
+    tocar el checkpoint ni la proyeccion `blueprints.state`.
+    """
+    try:
+        validated = HypothesisList(hypotheses=hypotheses).hypotheses
+    except ValidationError as exc:
+        raise HTTPException(status_code=422, detail=f"Hipotesis invalidas: {exc}") from exc
+    if not validated:
+        raise HTTPException(status_code=422, detail="Debe existir al menos una hipotesis para continuar.")
+    ids = [h.id for h in validated]
+    if len(ids) != len(set(ids)):
+        raise HTTPException(status_code=422, detail="Hipotesis invalidas: hay ids duplicados.")
+    return [h.model_dump(mode="json") for h in validated]
 
 
 def _project_from_checkpoint(thread_id: str) -> tuple[dict, bool]:
@@ -169,6 +196,7 @@ async def run_blueprint(
         "constraints": constraints,
         "revision_count": 0,
         "messages": [],
+        "include_research": body.include_research,
     }
     graph = get_graph()
     config = build_run_config(
@@ -185,6 +213,8 @@ async def resume_blueprint(
     user: User = Depends(get_current_user),
 ):
     bp = _own_blueprint(db, blueprint_id, user)
+    if body.stage == "hypotheses" and "hypotheses" in body.payload:
+        body.payload["hypotheses"] = _validate_hypotheses_edit(body.payload["hypotheses"])
     bp.status = "running"
     db.commit()
     graph = get_graph()

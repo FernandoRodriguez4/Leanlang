@@ -46,6 +46,7 @@ class BlueprintRunRequest(BaseModel):
     """Opcional: override de constraints al lanzar la corrida."""
 
     constraints: Constraints | None = None
+    include_research: bool = True
 
 
 class ResumeRequest(BaseModel):

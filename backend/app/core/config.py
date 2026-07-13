@@ -20,6 +20,13 @@ class Settings(BaseSettings):
     llm_api_key: str | None = None
     llm_version: str = "default"
 
+    # Investigador (Tavily) — solo configuracion, no activa ninguna ruta de
+    # codigo nueva en esta fase (ver docs/plan-agente-investigador-tavily.md).
+    tavily_api_key: str | None = None
+    research_enabled: bool = True
+    research_max_queries: int = 5
+    research_results_per_query: int = 5
+
     # DB
     database_url: str = "postgresql+psycopg://postgres:admin@localhost:5432/blueprint"
     langgraph_pg_dsn: str = "postgresql://postgres:admin@localhost:5432/blueprint"

@@ -43,5 +43,15 @@ class BlueprintState(TypedDict, total=False):
     revision_count: int  # cuantas veces el critico devolvio al Experiment Design
     human_feedback: dict[str, Any]  # ediciones del usuario tras un interrupt
 
+    # Agente Investigador (Tavily) — ver docs/plan-agente-investigador-tavily.md
+    research: dict[str, Any]  # ResearchReport serializado (artefacto, se persiste en el checkpointer)
+    # Control efimero: {execute, queries} escrito por el Supervisor y leido por
+    # route_entry y el nodo research. Aunque queda declarado en BlueprintState (el
+    # checkpointer no distingue campos efimeros de artefactos), conceptualmente
+    # solo tiene sentido durante el tramo Supervisor -> research de la primera
+    # construccion del Blueprint; no se lee ni se usa en ningun otro punto del flujo.
+    research_plan: dict[str, Any]
+    include_research: bool  # flag opcional por request (BlueprintRunRequest.include_research)
+
     # Traza para streaming/observabilidad
     messages: Annotated[list, add_messages]

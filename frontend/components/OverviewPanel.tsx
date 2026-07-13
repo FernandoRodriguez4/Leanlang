@@ -10,7 +10,7 @@ function Kpi({ label, value, sub, tone = "ink", status }: { label: string; value
     <div className="card p-4">
       <div className="flex items-center gap-1.5">
         {status && <StatusDot status={status} />}
-        <span className="annot">{label}</span>
+        <span className="annot text-sm font-bold text-ink">{label}</span>
       </div>
       <div className={`mt-1 font-display text-3xl font-bold tracking-tight ${accent}`}>{value}</div>
       {sub && <div className="mt-0.5 text-xs text-ink/55">{sub}</div>}
@@ -41,7 +41,7 @@ function HealthBanner({ scoreFrac, riskiest }: { scoreFrac: number | null; riski
     <div className={`flex items-center gap-4 rounded-2xl border p-5 ${HEALTH_TINT[status]}`}>
       <StatusDot status={status} className="h-4 w-4" pulse={status !== "neutral"} />
       <div>
-        <div className="annot mb-0.5">Estado del blueprint</div>
+        <div className="annot mb-0.5 text-sm font-bold text-ink">Estado del blueprint</div>
         <div className="font-display text-lg font-semibold text-ink">{title}</div>
         <div className="text-sm text-ink/65">{sub}</div>
       </div>
@@ -74,13 +74,13 @@ export function OverviewPanel({ bp, onJump }: { bp: Blueprint; onJump: (k: strin
           <div className="relative">
             {bp.problem?.statement && (
               <div className="mb-3">
-                <span className="annot text-desire-ink/80">Problema</span>
+                <span className="annot text-sm font-bold text-desire-ink/80">Problema</span>
                 <p className="mt-1 text-sm leading-relaxed text-ink/85">{bp.problem.statement}</p>
               </div>
             )}
             {bp.value_proposition?.statement && (
               <div>
-                <span className="annot text-viab-ink/80">Propuesta de valor</span>
+                <span className="annot text-sm font-bold text-viab-ink/80">Propuesta de valor</span>
                 <p className="mt-1 text-sm leading-relaxed text-ink/85">{bp.value_proposition.statement}</p>
               </div>
             )}
@@ -111,12 +111,12 @@ export function OverviewPanel({ bp, onJump }: { bp: Blueprint; onJump: (k: strin
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="card p-4">
-          <div className="annot mb-2">Cobertura de riesgo</div>
+          <div className="mb-2 font-display text-base font-bold tracking-normal text-ink">Cobertura de riesgo</div>
           <RiskBars bp={bp} />
         </div>
         <div className="card flex flex-col justify-between p-4">
           <div>
-            <div className="annot mb-2">Test Cards</div>
+            <div className="mb-2 font-display text-base font-bold tracking-normal text-ink">Test Cards</div>
             <p className="text-sm text-ink/65">
               {cards > 0 ? `${cards} tarjetas con métrica y criterio de éxito definidos.` : "Aún sin Test Cards."}
             </p>
