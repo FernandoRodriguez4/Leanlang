@@ -16,13 +16,25 @@ def get_real_client_ip(request: Request) -> str:
     """`request.client.host` es el hop TCP inmediato -- detras del proxy de
     Render/Cloudflare no es la IP real del cliente y varia entre requests
     (verificado: el limite nunca se acumulaba de forma confiable en prod).
-    La IP real del cliente es la primera de `X-Forwarded-For` (agregada por
-    el primer proxy que la recibe); se cae a `get_remote_address` si el
-    header no esta presente (dev local, sin proxy).
+
+    OJO: `X-Forwarded-For` NO es una alternativa segura -- es un header que
+    el propio cliente puede mandar directamente (verificado con
+    `curl -H "X-Forwarded-For: ..."`), y sin saber cuantos proxies confiables
+    hay por delante no se puede distinguir el valor real del inventado por un
+    atacante para saltarse el limite (hallazgo real de una revision de
+    seguridad sobre un intento anterior de este fix).
+
+    `CF-Connecting-IP` si es confiable: Render enruta todo el trafico via
+    Cloudflare (confirmado por `Server: cloudflare` / `CF-RAY` en las
+    respuestas), y Cloudflare fija este header el mismo en su borde a partir
+    de la conexion TCP real, sobrescribiendo cualquier valor que mande el
+    cliente -- no es spoofeable. Si no esta presente (dev local sin
+    Cloudflare delante), se cae a `request.client.host` (el peer TCP directo,
+    nunca un header manipulable) en vez de a X-Forwarded-For.
     """
-    forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
+    cf_ip = request.headers.get("cf-connecting-ip")
+    if cf_ip:
+        return cf_ip.strip()
     return get_remote_address(request)
 
 
