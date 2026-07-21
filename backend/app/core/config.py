@@ -49,7 +49,10 @@ class Settings(BaseSettings):
     # Auth
     jwt_secret: str = "change-me"
     jwt_algorithm: str = "HS256"
-    access_token_expire_minutes: int = 1440
+    # 4h: mitigacion mientras el JWT siga en localStorage (ver discusion de
+    # seguridad) -- acota la ventana util de un token robado sin necesitar la
+    # migracion a cookie httpOnly + CSRF (mas grande, diferida por ahora).
+    access_token_expire_minutes: int = 240
 
     # App
     app_env: str = "development"  # development | staging | production

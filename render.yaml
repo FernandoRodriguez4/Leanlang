@@ -99,7 +99,7 @@ services:
       - key: JWT_ALGORITHM
         value: HS256
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
-        value: "1440"
+        value: "240"   # 4h -- mitigacion mientras el JWT siga en localStorage
 
       # --- App: URL publica real del frontend (paso 2 del flujo de arriba) ---
       - key: CORS_ORIGINS
