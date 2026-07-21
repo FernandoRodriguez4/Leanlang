@@ -22,5 +22,10 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/public ./public
+# `next start` lee next.config.mjs directamente en runtime para opciones como
+# poweredByHeader (headers() SI queda horneado en .next/routes-manifest.json,
+# por eso la CSP funcionaba aunque faltara este archivo -- pero poweredByHeader
+# no, y sin el archivo Next cae en silencio al default `true`).
+COPY --from=builder /app/next.config.mjs ./next.config.mjs
 EXPOSE 3000
 CMD ["npm", "start"]
