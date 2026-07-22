@@ -11,7 +11,7 @@ from app.schemas.state import BlueprintState
 
 
 def value_proposition_node(state: BlueprintState) -> dict:
-    model = get_structured_model(ValueProposition)
+    model = get_structured_model(ValueProposition, tier="high")
     context = {
         "raw_idea": state["raw_idea"],
         "problem": state.get("problem", {}),

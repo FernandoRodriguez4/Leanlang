@@ -18,7 +18,7 @@ def risk_node(state: BlueprintState) -> dict:
     hyps = state.get("hypotheses", [])
 
     # 1) Clasificacion por tipo + nivel de riesgo.
-    cls_model = get_structured_model(ClassificationList)
+    cls_model = get_structured_model(ClassificationList, tier="medium")
     cls_result: ClassificationList = cls_model.invoke([
         SystemMessage(content=RISK_SYSTEM),
         HumanMessage(content=f"Clasifica estas hipotesis por tipo y nivel de riesgo:\n\n{jdump(hyps)}"),
@@ -26,7 +26,7 @@ def risk_node(state: BlueprintState) -> dict:
     classifications = [c.model_dump(mode="json") for c in cls_result.classifications]
 
     # 2) Priorizacion en el mapa 2x2 (importancia x evidencia).
-    prio_model = get_structured_model(PrioritizationList)
+    prio_model = get_structured_model(PrioritizationList, tier="medium")
     prio_result: PrioritizationList = prio_model.invoke([
         SystemMessage(content=PRIORITIZE_SYSTEM),
         HumanMessage(content=f"Prioriza en el mapa 2x2:\n\n{jdump({'hypotheses': hyps, 'classifications': classifications})}"),

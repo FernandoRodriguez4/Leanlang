@@ -43,7 +43,7 @@ def supervisor_node(state: BlueprintState) -> dict:
     if not _should_plan_research(state):
         return {"messages": messages}
 
-    model = get_structured_model(ResearchPlan)
+    model = get_structured_model(ResearchPlan, tier="low")
     plan_msgs = [
         SystemMessage(content=RESEARCH_PLAN_SYSTEM),
         HumanMessage(content=f"Idea de negocio:\n\n{state['raw_idea']}"),

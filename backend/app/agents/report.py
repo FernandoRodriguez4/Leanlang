@@ -11,7 +11,7 @@ from app.schemas.state import BlueprintState
 
 
 def report_node(state: BlueprintState) -> dict:
-    model = get_structured_model(Report)
+    model = get_structured_model(Report, tier="high")
     blueprint = {
         "problem": state.get("problem", {}),
         "customer_segment": state.get("customer_segment", {}),

@@ -45,7 +45,7 @@ def research_node(state: BlueprintState) -> dict:
 
     try:
         results = _search_all(queries)
-        model = get_structured_model(ResearchReport)
+        model = get_structured_model(ResearchReport, tier="low")
         synth_msgs = [
             SystemMessage(content=RESEARCH_SYSTEM),
             HumanMessage(

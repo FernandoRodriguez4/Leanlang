@@ -20,6 +20,17 @@ class Settings(BaseSettings):
     llm_api_key: str | None = None
     llm_version: str = "default"
 
+    # Modelo por tier (mismo provider/base_url/api_key -- solo cambia el nombre
+    # del modelo). None cae en `llm_model` (comportamiento actual sin cambios
+    # si no se configuran). Pensado para no pagar el modelo mas caro en
+    # agentes de tarea mecanica/acotada (ver app/agents/*.py, parametro `tier`
+    # de get_structured_model): "high" para las tareas con mas libertad
+    # creativa (hipotesis, critico, canvas base, informe final), "low" para
+    # decisiones simples (supervisor, investigador). "medium" cubre el resto.
+    llm_model_high: str | None = None
+    llm_model_medium: str | None = None
+    llm_model_low: str | None = None
+
     # Investigador (Tavily) — solo configuracion, no activa ninguna ruta de
     # codigo nueva en esta fase (ver docs/plan-agente-investigador-tavily.md).
     tavily_api_key: str | None = None

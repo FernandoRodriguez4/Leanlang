@@ -80,7 +80,7 @@ def experiment_design_node(state: BlueprintState) -> dict:
             + jdump(state["critic_review"]["issues"])
         )
 
-    model = get_structured_model(ExperimentRecList)
+    model = get_structured_model(ExperimentRecList, tier="medium")
     msgs = [
         SystemMessage(content=EXPERIMENT_DESIGN_SYSTEM),
         HumanMessage(content=(

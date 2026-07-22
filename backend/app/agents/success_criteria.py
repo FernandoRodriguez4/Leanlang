@@ -45,7 +45,7 @@ def _assemble_test_cards(state: BlueprintState, criteria: list[dict], metrics: l
 
 
 def success_criteria_node(state: BlueprintState) -> dict:
-    model = get_structured_model(SuccessCriterionList)
+    model = get_structured_model(SuccessCriterionList, tier="medium")
     context = {
         "hypotheses": state.get("hypotheses", []),
         "recommendations": state.get("recommendations", []),

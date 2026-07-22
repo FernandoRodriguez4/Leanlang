@@ -7,6 +7,7 @@ codigo de los agentes. Esto facilita la comparacion de modelos en la tesis.
 from __future__ import annotations
 
 from functools import lru_cache
+from typing import Literal
 
 from langchain.chat_models import init_chat_model
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -14,14 +15,35 @@ from langchain_core.runnables import RunnableLambda
 
 from app.core.config import settings
 
+Tier = Literal["high", "medium", "low"]
+
+_TIER_SETTINGS = {
+    "high": "llm_model_high",
+    "medium": "llm_model_medium",
+    "low": "llm_model_low",
+}
+
+
+def _resolve_model(tier: Tier | None) -> str:
+    """Nombre del modelo para el tier pedido; cae en LLM_MODEL si el tier no
+    tiene su propia variable configurada (o si no se pide tier)."""
+    if tier is not None:
+        override = getattr(settings, _TIER_SETTINGS[tier])
+        if override:
+            return override
+    return settings.llm_model
+
 
 @lru_cache
-def get_model(temperature: float | None = None) -> BaseChatModel:
+def get_model(temperature: float | None = None, tier: Tier | None = None) -> BaseChatModel:
     """Devuelve el chat model configurado por env (cacheado).
 
     Soporta endpoints compatibles con OpenAI (DeepSeek, Groq, Together, Ollama...)
-    via LLM_BASE_URL y LLM_API_KEY.
+    via LLM_BASE_URL y LLM_API_KEY. `tier` selecciona el nombre del modelo
+    (LLM_MODEL_HIGH/MEDIUM/LOW) dentro del mismo provider/endpoint -- pensado
+    para no pagar el modelo mas caro en agentes de tarea mecanica/acotada.
     """
+    model_name = _resolve_model(tier)
     kwargs: dict = {}
     if settings.llm_base_url:
         kwargs["base_url"] = settings.llm_base_url
@@ -34,7 +56,7 @@ def get_model(temperature: float | None = None) -> BaseChatModel:
         # Hay que desactivarlo explicitamente (mismo esquema que el thinking de Anthropic).
         kwargs["extra_body"] = {"thinking": {"type": "disabled"}}
     return init_chat_model(
-        model=settings.llm_model,
+        model=model_name,
         model_provider=settings.llm_provider,
         temperature=settings.llm_temperature if temperature is None else temperature,
         **kwargs,
@@ -56,18 +78,21 @@ def _raise_if_none(value):
     return value
 
 
-def get_structured_model(schema, temperature: float | None = None):
+def get_structured_model(schema, temperature: float | None = None, tier: Tier | None = None):
     """Modelo con salida estructurada validada contra un schema Pydantic.
 
     Usa function-calling (tools), compatible con OpenAI/Anthropic/DeepSeek, en lugar
     de json_schema (que no todos los endpoints compatibles soportan).
+
+    `tier` ("high" | "medium" | "low") selecciona el modelo via LLM_MODEL_HIGH/
+    MEDIUM/LOW (ver get_model); sin tier, usa LLM_MODEL como siempre.
 
     `with_retry` reintenta cuando el modelo devuelve una salida vacia o mal formada
     (p. ej. DeepSeek a veces responde `{}`, o el tool call sale vacio -- ver
     `_raise_if_none`), evitando que una corrida entera falle por una respuesta
     puntualmente invalida.
     """
-    structured = get_model(temperature=temperature).with_structured_output(
+    structured = get_model(temperature=temperature, tier=tier).with_structured_output(
         schema, method="function_calling"
     )
     chain = structured | RunnableLambda(_raise_if_none)

@@ -17,7 +17,7 @@ def sequencing_node(state: BlueprintState) -> dict:
     recs = state.get("recommendations", [])
     valid_ids = {r.get("experiment_id") for r in recs}
 
-    model = get_structured_model(ValidationRoadmap)
+    model = get_structured_model(ValidationRoadmap, tier="medium")
     context = {
         "recommendations": [
             {k: r.get(k) for k in ("hypothesis_id", "experiment_id", "experiment_name", "stage", "sequence_order", "cost")}

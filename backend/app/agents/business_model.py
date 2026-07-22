@@ -11,7 +11,7 @@ from app.schemas.state import BlueprintState
 
 
 def business_model_node(state: BlueprintState) -> dict:
-    model = get_structured_model(BusinessModel)
+    model = get_structured_model(BusinessModel, tier="high")
     context = {
         "raw_idea": state["raw_idea"],
         "customer_segment": state.get("customer_segment", {}),

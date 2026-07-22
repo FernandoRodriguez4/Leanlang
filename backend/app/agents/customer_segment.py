@@ -11,7 +11,7 @@ from app.schemas.state import BlueprintState
 
 
 def customer_segment_node(state: BlueprintState) -> dict:
-    model = get_structured_model(CustomerSegment)
+    model = get_structured_model(CustomerSegment, tier="high")
     context = {"raw_idea": state["raw_idea"], "problem": state.get("problem", {})}
     evidence = research_context(state)
     prefix = f"Evidencia externa disponible:\n{evidence}\n\n" if evidence else ""

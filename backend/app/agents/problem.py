@@ -11,7 +11,7 @@ from app.schemas.state import BlueprintState
 
 
 def problem_node(state: BlueprintState) -> dict:
-    model = get_structured_model(Problem)
+    model = get_structured_model(Problem, tier="high")
     evidence = research_context(state)
     prefix = f"Evidencia externa disponible:\n{evidence}\n\n" if evidence else ""
     msgs = [

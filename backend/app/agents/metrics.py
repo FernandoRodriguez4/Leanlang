@@ -11,7 +11,7 @@ from app.schemas.state import BlueprintState
 
 
 def metrics_node(state: BlueprintState) -> dict:
-    model = get_structured_model(MetricSpecList)
+    model = get_structured_model(MetricSpecList, tier="medium")
     context = {
         "hypotheses": state.get("hypotheses", []),
         "recommendations": state.get("recommendations", []),

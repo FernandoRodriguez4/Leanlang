@@ -11,7 +11,7 @@ from app.schemas.state import BlueprintState
 
 
 def decision_node(state: BlueprintState) -> dict:
-    model = get_structured_model(DecisionRuleList)
+    model = get_structured_model(DecisionRuleList, tier="medium")
     context = {
         "hypotheses": state.get("hypotheses", []),
         "recommendations": state.get("recommendations", []),

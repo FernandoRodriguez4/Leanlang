@@ -11,7 +11,7 @@ from app.schemas.state import BlueprintState
 
 
 def hypotheses_node(state: BlueprintState) -> dict:
-    model = get_structured_model(HypothesisList)
+    model = get_structured_model(HypothesisList, tier="high")
     context = {
         "problem": state.get("problem", {}),
         "customer_segment": state.get("customer_segment", {}),

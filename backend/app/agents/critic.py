@@ -11,7 +11,7 @@ from app.schemas.testcard import CriticReview
 
 
 def critic_node(state: BlueprintState) -> dict:
-    model = get_structured_model(CriticReview)
+    model = get_structured_model(CriticReview, tier="high")
     blueprint = {
         "hypotheses": state.get("hypotheses", []),
         "classifications": state.get("classifications", []),
